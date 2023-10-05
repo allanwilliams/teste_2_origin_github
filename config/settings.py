@@ -39,7 +39,7 @@ ALLOWED_HOSTS =  env("ALLOWED_HOSTS", default=['localhost'])
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'adminlteui',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -47,6 +47,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+]
+
+THIRD_PARTY_APPS = [
     'mozilla_django_oidc',
     "corsheaders",
     'treebeard',
@@ -54,11 +58,17 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rangefilter',
     "reversion",
+    
+]
+
+LOCAL_APPS = [
     'apps.core',
     'apps.users',
     'apps.session',
     'apps.django_sso_app'
 ]
+
+INSTALLED_APPS = THIRD_PARTY_APPS + DJANGO_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
