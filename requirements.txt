@@ -51,3 +51,5 @@ urllib3==2.0.5
 webservices==0.7
 wrapt==1.12.1
 zipp==3.15.0
+Pygments==2.13.0
+humanize==4.6.0

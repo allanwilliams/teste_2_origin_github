@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     "reversion",
     'apps.core',
     'apps.users',
-    'apps.cotin',
+    'apps.session',
     'apps.django_sso_app'
 ]
 
@@ -70,6 +70,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "django_currentuser.middleware.ThreadLocalUserMiddleware",
+    "apps.session.middleware.SessionMiddleware",
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -124,6 +125,9 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ]
 }
 
 
@@ -172,6 +176,25 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+    {
+        "NAME": "apps.session.password_validation.UpperCase",
+        "OPTIONS": { "min_length": 1 }
+    },
+    {
+        "NAME": "apps.session.password_validation.SpecialCase",
+        "OPTIONS": { "min_length": 1 }
+    },
+    {
+        "NAME": "apps.session.password_validation.RepeticaoCase",
+        "OPTIONS": { "min_length": 2 }
+    },
+    {
+        "NAME": "apps.session.password_validation.AcentoCase",
+    },
+    {
+        "NAME": "apps.session.password_validation.OldPassword",
+        "OPTIONS": { "min_length": 3 }
     },
 ]
 
@@ -243,7 +266,7 @@ if USE_FUSIONAUTH:
 
     # Replace localhost with the machine's IP address where the Django application is running if not on localhost
     LOGIN_REDIRECT_URL = "/admin"
-    LOGOUT_REDIRECT_URL = "/oidc/authenticate/"
+    LOGOUT_REDIRECT_URL = "/oidc/callback/"
 
     FUSIONAUTH_USER_API_KEY = env("FUSIONAUTH_USER_API_KEY",default="I0tmvHlM0mNLwNNsVGs_2F9jVK5SQp_hbKUlLKPH-cskQShspmGG2-3z")
     AUTHENTICATION_BACKENDS = (

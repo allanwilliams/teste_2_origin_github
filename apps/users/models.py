@@ -3,9 +3,12 @@ from django.db import models
 from django.db.models import CharField
 from django.utils.translation import ugettext_lazy as _
 from django.dispatch.dispatcher import receiver
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
+from django.conf import settings
+from django_currentuser.middleware import get_current_authenticated_user
 from apps.users.choices import  CHOICES_SEXO_USER
 from apps.core.mixins import BaseModel
+from datetime import datetime
 
 class User(AbstractUser):
     PAPEL_DEFENSOR = 2
@@ -242,3 +245,83 @@ class DefensoresLotacoes(BaseModel):
         verbose_name = 'Lotação dos defensores'
         verbose_name_plural = 'Lotações dos defensores'
         ordering = ['-data_inicio', ]
+
+class UserPreferencias(BaseModel):
+
+    class Tipos(models.IntegerChoices):
+        # ABAS = 1, 'Habilitar formulário em abas'
+        PROCESSO_ANTIGO = 2, 'Habilitar antiga tela de processo'
+        MENU_COMPACTO = 3, 'Habilitar menu compacto'
+        AGENDA_ANTIGA = 4, 'Habilitar agenda antiga'
+
+    
+    user = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        related_name='%(class)s_user',
+    )
+
+    preferencia = models.IntegerField('Preferência', choices=Tipos.choices)
+
+
+    def get_user_preferencias():
+        current_user = get_current_authenticated_user()
+        preferencias_obj = {}
+        if current_user:
+            preferencias = UserPreferencias.objects.filter(user=current_user)
+            tipos = UserPreferencias.Tipos
+            
+
+            for tipo in tipos:
+                if tipo.name == 'MENU_COMPACTO' and not current_user.is_superuser:
+                    pass
+                else:
+                    preferencias_obj[tipo.name] = {
+                        'id': tipo.value,
+                        'label':tipo.label,
+                        'value':preferencias.filter(preferencia=tipo).first() or False
+                    }
+
+            processo_antigo = preferencias.filter(preferencia=2).first() or False
+
+            preferencias_obj['URL'] = '/atendimento/assistido-processo/processo-visualizar'
+            if processo_antigo:
+                preferencias_obj['URL'] = '/admin/atendimento/processos'
+            
+        return preferencias_obj
+
+
+    class Meta:
+        verbose_name = 'Preferência do Usuário'
+        verbose_name_plural = 'Preferências dos Usuários'
+
+class TrocaSenhaUsuario(BaseModel):
+    user = models.ForeignKey(
+        'User',
+        on_delete=models.DO_NOTHING,
+        related_name='%(class)s_usuario',
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+    
+    password = models.CharField(_('password'), max_length=128)
+    
+    @receiver(pre_save, sender=User)
+    def user_updated(sender, **kwargs):
+        if not settings.USE_FUSIONAUTH:
+            try:
+                user = kwargs.get('instance', None)
+                if user and hasattr(user,'pk'):
+                        user_old = User.objects.get(pk=user.pk)
+                        if user and user_old:
+                            if user.password != user_old.password:
+                                dict_password = {
+                                    'user': user,
+                                    'password': user.password,
+                                    'criado_em': datetime.now()
+                                }
+                                grava_senha = TrocaSenhaUsuario(**dict_password)
+                                grava_senha.save()
+            except:
+                pass

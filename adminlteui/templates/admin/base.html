@@ -4,6 +4,8 @@
 {% get_adminlte_settings as adminlte %}
 {% get_adminlte_option 'site_logo' as adminlte_site_logo  %}
 
+{% get_use_fusionauth as use_fusionauth %}
+
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
 <head>
     <meta charset="utf-8">
@@ -74,7 +76,7 @@
                 <img src={% static "admin/dist/img/default-log.svg" %} class="user-image" alt="User Image" style="width:45px;height:45px;padding:5px;">
                 {% endif %}
                 <b>
-                  COTIN
+                  TEMPLATE-ADMIN
                 </b>
             </span>
         </a>
@@ -177,7 +179,11 @@
                             <!-- Menu Footer-->
                             <li class="user-footer">
                                 <div class="pull-left">
-                                    <a  href="/django_sso_app/sso-change-password" class="btn btn-default btn-flat">{% trans 'Change password' %}</a>
+                                    {% if use_fusionauth %}
+                                        <a  href="/django_sso_app/sso-change-password" class="btn btn-default btn-flat">{% trans 'Change password' %}</a>
+                                    {% else %}
+                                        <a  href="/admin/password_change/" class="btn btn-default btn-flat">{% trans 'Change password' %}</a>
+                                    {% endif %}
                                 </div>
                                 <div class="pull-right">
                                     <a href="{% url 'admin:logout' %}" class="btn btn-default btn-flat">{% trans 'Log out' %}</a>

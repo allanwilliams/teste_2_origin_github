@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib import messages
+from django.contrib import messages, auth
 from apps.django_sso_app.forms import AdminPasswordChangeForm
 
 def change_password(request):
@@ -20,5 +20,12 @@ def change_password(request):
 
 def login(request):
     if request.user.is_authenticated:
-        return redirect(f'/admin/')
+        if request.user.is_staff:
+            return redirect(f'/admin/')
+        else:
+            return redirect('django_sso_unauthorized')
     return redirect('oidc_authentication_init')
+
+def unauthorized(request):
+    auth.logout(request)
+    return render(request,'django_sso_app/unauthorized.html')

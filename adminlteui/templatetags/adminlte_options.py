@@ -59,3 +59,7 @@ def get_adminlte_settings():
 @register.simple_tag
 def get_adminlte_version():
     return version
+
+@register.simple_tag
+def get_use_fusionauth():
+    return settings.USE_FUSIONAUTH
