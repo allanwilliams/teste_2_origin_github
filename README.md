@@ -60,7 +60,7 @@ exemplo:
 PAPEL[Colaborador(a)]
 ```
 
-- Configuraççies de Grupos
+- Configurações de Grupos
 
 As roles de grupo deverão possuir a palavra chave GRUPO(caixa alta) e o nome do grupo dentro de [] (cochetes)
 
