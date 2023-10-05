@@ -53,6 +53,7 @@ FLAG[IS_STAFF]: Garante acesso ao usuário dentro do ambiente da aplicação
 Configuração de Papeis
 As roles de papel deverão possuir a palavra chave PAPEL(caixa alta) e o nome do papel dentro de [] (cochetes). Dessa forma o django_sso_app irá reconhecer o papel do usuário e atualiza-lo corretamente. 
 Obs: Somente uma role de Papel poderá ser habilitada por usuário na Aplicação, caso mais de uma seja habilitada a ultima role é que valerá.
+
 exemplo:
 ```
 PAPEL[Colaborador(a)]
@@ -60,6 +61,7 @@ PAPEL[Colaborador(a)]
 
 Configuraççies de Grupos
 As roles de grupo deverão possuir a palavra chave GRUPO(caixa alta) e o nome do grupo dentro de [] (cochetes)
+
 exemplo:
 ```
 GRUPO[Defensores]
