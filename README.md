@@ -68,3 +68,22 @@ exemplo:
 ```
 GRUPO[Defensores]
 ```
+
+## Testes
+Antes de iniciar os testes habilite a venv
+```
+source venv/bin/activate
+```
+Executando todos dos testes
+
+```
+coverage run manage.py test apps; coverage html --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" -d tests/coverage
+```
+
+Executando testes por app
+
+```
+coverage run manage.py test apps/{nome_do_app}; coverage html --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" -d tests/coverage
+```
+
+Os resultados dos testes serão gravados na pasta tests/coverage/ e podem ser acessados abrindo o arquivo tests/coverage/index.html
