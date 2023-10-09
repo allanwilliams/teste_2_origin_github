@@ -11,6 +11,7 @@ from django.dispatch.dispatcher import receiver
 from datetime import datetime,timedelta
 from django.contrib import messages
 from django.utils.html import format_html
+from django.utils import timezone
 
 def _update_session_auth_hash(request, user):
     """
@@ -62,7 +63,6 @@ class UserSession(BaseModel):
         
     @receiver(user_logged_in)
     def remover_sessao(sender, user, request, **kwargs):
-        user.num_tentativa_acesso = 0
         user.save()
         Session.objects.filter(
             usersession__user=user
@@ -73,29 +73,9 @@ class UserSession(BaseModel):
             session_id=request.session.session_key
         )
     
-    @receiver(user_login_failed)
-    def block_user(sender, credentials, request, **kwargs):
-        user = User.objects.filter(username=credentials['username']).first()
-        MUM_TENTATIVA_BLOCK = 10
-        if user:
-            user.num_tentativa_acesso = user.num_tentativa_acesso + 1
-            user.save()
-            if user.num_tentativa_acesso >= 2:
-                TENTATIVA_RESTANTE = MUM_TENTATIVA_BLOCK - user.num_tentativa_acesso
-                messages.add_message(request, messages.ERROR,"Sucessivas tentativas de login sem sucesso!")
-                messages.add_message(request, messages.ERROR,format_html(f"Você possui <strong>{TENTATIVA_RESTANTE} tentativas restantes</strong>"))
-            if user.num_tentativa_acesso == 9:
-                TENTATIVA_RESTANTE = MUM_TENTATIVA_BLOCK - user.num_tentativa_acesso       
-                messages.add_message(request, messages.ERROR,"Seu usuário será bloqueado na próxima tentativa!")
-            if user.num_tentativa_acesso >= 10:
-                user.is_active = False
-                user.num_tentativa_acesso = 0
-                user.save()
-                messages.add_message(request, messages.ERROR,f"Usuário bloqueado por múltiplas tentativas de acesso incorretas! Favor entrar em contato com a equipe de suporte")
-        
     def time_online(self):
-        me = self.modificado_em if self.modificado_em is not None else datetime.now() - timedelta(minutes=6)
-        final = datetime.now() - timedelta(minutes=5)
+        me = self.modificado_em if self.modificado_em is not None else timezone.now() - timedelta(minutes=6)
+        final = timezone.now() - timedelta(minutes=5)
         
         return False if me < final  else True
     
@@ -106,11 +86,5 @@ class UserPage(BaseModel):
     class Meta:
         verbose_name = "usuário página"
         verbose_name_plural = "Usuários página"
-        
-    def time_online(self):
-        me = self.modificado_em if self.modificado_em is not None else datetime.now() - timedelta(minutes=6)
-        final = datetime.now() - timedelta(minutes=5)
-        
-        return False if me < final  else True
     
 

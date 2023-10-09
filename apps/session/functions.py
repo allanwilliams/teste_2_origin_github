@@ -1,14 +1,11 @@
 from django.contrib.sessions.models import Session
 from .models import UserSession
 
-def removerSessao(modeladmin, request, queryset):
-    users_selecionados = request.POST.getlist('_selected_action')
-    
+def remover_sessao(modeladmin, request, queryset):
+    users_selecionados = request.get('POST').get('_selected_action')
     for user in users_selecionados:
-        print(user)
-        user_id = UserSession.objects.filter(id = user)
-        print(user_id[0].user_id)
+        session = UserSession.objects.filter(user_id=user).first()
         Session.objects.filter(
-            usersession__user=user_id[0].user_id
+            usersession__user=session.user_id
         ).delete()
-removerSessao.short_description = "Deslogar usuário"
+remover_sessao.short_description = "Deslogar usuário"

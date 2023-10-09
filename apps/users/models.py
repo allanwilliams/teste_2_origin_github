@@ -8,10 +8,10 @@ from django.conf import settings
 from django_currentuser.middleware import get_current_authenticated_user
 from apps.users.choices import  CHOICES_SEXO_USER
 from apps.core.mixins import BaseModel
-from datetime import datetime
+from django.utils import timezone
 
 class User(AbstractUser):
-    PAPEL_DEFENSOR = 2
+    PAPEL_DEFENSOR = 1
     
     cols = {
         'name': 3,
@@ -92,6 +92,21 @@ class User(AbstractUser):
         else:
             return False
     
+    def get_user_preferencias(self):
+        preferencias_obj = {}
+        if self:
+            preferencias = UserPreferencias.objects.filter(user=self)
+            tipos = UserPreferencias.Tipos
+            
+
+            for tipo in tipos:
+                preferencias_obj[tipo.name] = {
+                    'id': tipo.value,
+                    'label':tipo.label,
+                    'value':preferencias.filter(preferencia=tipo).first() or False
+                }
+        return preferencias_obj
+    
 
 @receiver(post_save, sender=User)
 def create_app_user_str(sender, instance, created, **kwargs):
@@ -101,10 +116,6 @@ def create_app_user_str(sender, instance, created, **kwargs):
                 name = instance.name.split(' ')
             else:
                 name = [instance.name, instance.name]
-            if not instance.first_name:
-                instance.first_name = name[0]
-            if not instance.last_name:
-                instance.last_name = name[-1]   
 
         instance.user_str = '{:08n} {} {} ({})'.format(instance.id, instance.first_name, instance.last_name,instance.username)
         instance.save() 
@@ -249,11 +260,7 @@ class DefensoresLotacoes(BaseModel):
 class UserPreferencias(BaseModel):
 
     class Tipos(models.IntegerChoices):
-        # ABAS = 1, 'Habilitar formulário em abas'
-        PROCESSO_ANTIGO = 2, 'Habilitar antiga tela de processo'
-        MENU_COMPACTO = 3, 'Habilitar menu compacto'
-        AGENDA_ANTIGA = 4, 'Habilitar agenda antiga'
-
+        MENU_COMPACTO = 1, 'Habilitar menu compacto'
     
     user = models.ForeignKey(
         User,
@@ -262,34 +269,6 @@ class UserPreferencias(BaseModel):
     )
 
     preferencia = models.IntegerField('Preferência', choices=Tipos.choices)
-
-
-    def get_user_preferencias():
-        current_user = get_current_authenticated_user()
-        preferencias_obj = {}
-        if current_user:
-            preferencias = UserPreferencias.objects.filter(user=current_user)
-            tipos = UserPreferencias.Tipos
-            
-
-            for tipo in tipos:
-                if tipo.name == 'MENU_COMPACTO' and not current_user.is_superuser:
-                    pass
-                else:
-                    preferencias_obj[tipo.name] = {
-                        'id': tipo.value,
-                        'label':tipo.label,
-                        'value':preferencias.filter(preferencia=tipo).first() or False
-                    }
-
-            processo_antigo = preferencias.filter(preferencia=2).first() or False
-
-            preferencias_obj['URL'] = '/atendimento/assistido-processo/processo-visualizar'
-            if processo_antigo:
-                preferencias_obj['URL'] = '/admin/atendimento/processos'
-            
-        return preferencias_obj
-
 
     class Meta:
         verbose_name = 'Preferência do Usuário'
@@ -319,7 +298,7 @@ class TrocaSenhaUsuario(BaseModel):
                                 dict_password = {
                                     'user': user,
                                     'password': user.password,
-                                    'criado_em': datetime.now()
+                                    'criado_em': timezone.now()
                                 }
                                 grava_senha = TrocaSenhaUsuario(**dict_password)
                                 grava_senha.save()

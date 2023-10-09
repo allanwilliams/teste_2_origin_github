@@ -42,8 +42,10 @@ class UserSessionAdmin(admin.ModelAdmin):
     list_filter = ('user__papel',)
     list_display = ('user','get_titulo','get_dt_login',)
     readonly_fields = ('user','session',)
+    
     actions = [
-        removerSessao
+        'delete_selected',
+        remover_sessao
     ]
     
     def get_titulo(self,obj):
