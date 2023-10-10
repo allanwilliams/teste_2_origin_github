@@ -22,3 +22,4 @@ UnitTest:
       fi
     - coverage report -m
     - coverage xml -i
+    - coverage-badge -o http://gitlab.defensoria.ce.def.br/dev-dpge/template-django-admin/badges/master/coverage.svg
