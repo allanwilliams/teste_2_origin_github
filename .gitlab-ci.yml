@@ -15,7 +15,7 @@ UnitTest:
     - pip install -r requirements.txt
   script:
     - coverage run --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" manage.py test apps --settings config.cicd_settings
-    - COVERAGE_PERCENTAGE=$(coverage report --fail-under=90 | grep TOTAL | awk '{print $NF}')
+    - COVERAGE_PERCENTAGE=$(coverage report --skip-covered | awk '/TOTAL/ {print $NF}')
     - if [ "$(echo "$COVERAGE_PERCENTAGE >= 90" | bc -l)" -ne 1 ]; then
         echo "A cobertura de código é menor do que o mínimo exigido (90%)";
         exit 1;
