@@ -10,16 +10,14 @@ UnitTest:
     POSTGRES_DB: tests
     POSTGRES_USER: postgres
     POSTGRES_PASSWORD: postgres
-    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip_cache"
-  cache:
-    paths:
-      - $PIP_CACHE_DIR
   before_script:
     - export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB
-    - if [ -e $PIP_CACHE_DIR ]; then echo "Using cached pip dependencies"; cp -r $PIP_CACHE_DIR $CI_PROJECT_DIR; fi
     - pip install -r requirements.txt
-    - rm -rf $PIP_CACHE_DIR && mv $CI_PROJECT_DIR/.pip $PIP_CACHE_DIR
   script:
     - coverage run --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" manage.py test apps --settings config.cicd_settings
     - coverage report -m
     - coverage xml -i
+  artifacts:
+    when: always
+    paths:
+      - htmlcov/
