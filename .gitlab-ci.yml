@@ -17,7 +17,3 @@ UnitTest:
     - coverage run --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" manage.py test apps --settings config.cicd_settings
     - coverage report -m
     - coverage xml -i
-  artifacts:
-    when: always
-    paths:
-      - htmlcov/
