@@ -17,4 +17,4 @@ UnitTest:
     - export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB
     - pip install -r requirements.txt
   script:
-    - coverage run manage.py test apps
+    - coverage run manage.py test apps --settings config.cicd_settings
