@@ -20,4 +20,3 @@ UnitTest:
     - coverage run manage.py test apps --settings config.cicd_settings
     - coverage report -m
     - coverage xml -i
-    - coverage-badge -o coverage.svg
