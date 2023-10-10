@@ -10,6 +10,3 @@ UnitTest:
     - pip install -r requirements.txt
   script:
     - coverage run manage.py test apps
-    - coverage report -m
-    - coverage xml -i
-    - coverage-badge -o coverage.svg
