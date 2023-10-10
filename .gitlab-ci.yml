@@ -8,9 +8,6 @@ UnitTest:
     - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
     - echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list
     - pip install -r requirements.txt
-    - python manage.py makemigrations
-    - python manage.py migrate
-    - python manage.py runserver 8000 &
   script:
     - coverage run manage.py test apps
     - coverage report -m
