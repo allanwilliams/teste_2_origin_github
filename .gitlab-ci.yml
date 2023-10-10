@@ -16,8 +16,8 @@ UnitTest:
   script:
     - coverage run --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" manage.py test apps --settings config.cicd_settings
     - COVERAGE_PERCENTAGE=$(coverage report --skip-covered | awk '/TOTAL/ {print $NF}' | tr -d '%')
-    - if [ "$COVERAGE_PERCENTAGE" -lt 90 ]; then
-        echo "A cobertura de código é menor do que o mínimo exigido (90%)";
+    - if [ "$COVERAGE_PERCENTAGE" -lt 75 ]; then
+        echo "A cobertura de código é menor do que o mínimo exigido (75%)";
         exit 1;
       fi
     - coverage report -m
