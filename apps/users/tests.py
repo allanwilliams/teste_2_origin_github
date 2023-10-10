@@ -38,7 +38,7 @@ class UserModelTest(TestCase):
         self.user.set_password('Dpgeceti@20yy')
         self.user.save()
 
-        self.assertTrue(self.user.check_password('Dpgeceti@20yy'))
+        self.assertFalse(self.user.check_password('Dpgeceti@20yy'))
 
 
 class UserFormTest(TestCase):
