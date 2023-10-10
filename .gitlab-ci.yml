@@ -1,35 +1,20 @@
+stages:
+  - test
+
 UnitTest:
+  image: python:3.8.10
+  stage: test
   services:
-  - postgres:14.3
+    - postgres:12.2-alpine
   variables:
-    POSTGRES_DB: test
+    POSTGRES_DB: tests
     POSTGRES_USER: postgres
     POSTGRES_PASSWORD: postgres
+  cache:
+    paths:
+      - ~/.cache/pip/
+  before_script:
+    - export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB
+    - pip install -r requirements.txt
   script:
-  - export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB
-  - apt-get update -qy
-  - apt-get install -y python-dev python-pip
-  - pip install -r requirements.txt
-  - coverage run manage.py test apps
-
-
-# stages:
-#   - test
-
-# UnitTest:
-#   image: python:3.8.10
-#   stage: test
-#   services:
-#     - postgres:12.2-alpine
-#   variables:
-#     POSTGRES_DB: tests
-#     POSTGRES_USER: postgres
-#     POSTGRES_PASSWORD: postgres
-#   cache:
-#     paths:
-#       - ~/.cache/pip/
-#   before_script:
-#     - export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB
-#     - pip install -r requirements.txt
-#   script:
-#     - coverage run manage.py test apps
+    - coverage run manage.py test apps
