@@ -41,17 +41,17 @@ class LogRequests(models.Model):
         null=True,
         blank=True
     )
-    session_key = models.CharField(max_length=300,null=True,blank=True)
-    ip = models.CharField(max_length=20,null=True,blank=True)
-    ip_publico = models.CharField(max_length=20,null=True,blank=True)
-    navegador = models.CharField(max_length=300,null=True,blank=True)
-    url = models.CharField(max_length=300,null=True,blank=True)
-    url_atual = models.CharField(max_length=500,null=True,blank=True)
+    session_key = models.CharField(max_length=300,blank=True)
+    ip = models.CharField(max_length=20,blank=True)
+    ip_publico = models.CharField(max_length=20,blank=True)
+    navegador = models.CharField(max_length=300,blank=True)
+    url = models.CharField(max_length=300,blank=True)
+    url_atual = models.CharField(max_length=500,blank=True)
     data_hora = models.DateTimeField(blank=True, null=True, auto_now_add=True)
-    metodo  = models.CharField(max_length=10,null=True,blank=True)
-    parametros  = models.TextField(null=True,blank=True)
-    response = models.TextField(null=True,blank=True)
-    tempo = models.FloatField(null=True,blank=True)
+    metodo  = models.CharField(max_length=10,blank=True)
+    parametros  = models.TextField(blank=True)
+    response = models.TextField(blank=True)
+    tempo = models.FloatField(blank=True)
 
 class UserSession(BaseModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

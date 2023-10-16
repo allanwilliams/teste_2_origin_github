@@ -31,7 +31,7 @@ class GeneralViewSet(ModelViewSet):
     def model(self):
         try:
             return apps.get_model(app_label=str(self.kwargs['app_label']), model_name=str(self.kwargs['model_name']))
-        except:
+        except Exception:
             return None
 
 
@@ -45,25 +45,17 @@ class GeneralViewSet(ModelViewSet):
         return True
 
     def get_queryset(self):
-        if self.model:
-            model = self.model
-            if self.valida_permissao(user=self.request.user,model=model,app_label=self.kwargs['app_label'],model_name=self.kwargs['model_name']):
-                id = self.kwargs.get('id')
-                if id:
-                    return model.objects.filter(pk=id)
-                
-                if self.request.GET:
-                    result = model.objects.filter(pk__gte=0)
-                    for param in self.request.GET:
-                        value = self.request.GET.get(param)
-                        param = param + '__icontains' if self.request.GET.get('icontains') else param
-                        try:
-                            result = result.filter(**{ param:value })
-                        except: pass
-                    
-                    return result.order_by('id')
-                
-                return model.objects.all().order_by('id')
+        if self.model and self.valida_permissao(user=self.request.user,model=self.model,app_label=self.kwargs['app_label'],model_name=self.kwargs['model_name']):
+            object_pk = self.kwargs.get('id')
+            if object_pk:
+                return self.model.objects.filter(pk=object_pk)
+            if self.request.GET:
+                result = self.model.objects.filter(pk__gte=0)
+                for param in self.request.GET:
+                    try:
+                        result = result.filter(**{ param:self.request.GET.get(param) })
+                    except Exception: pass
+                return result.order_by('id')
         return []
 
     def get_serializer_class(self):

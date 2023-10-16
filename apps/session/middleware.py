@@ -6,9 +6,11 @@ from asgiref.sync import sync_to_async
 import asyncio
 import datetime
 from django.db.utils import InterfaceError
+from django.utils import timezone
 from django.shortcuts import redirect
 from apps.users.models import UserPreferencias
 
+admin_url = '/admin/'
 block_list = [
     '/core/api/general/',
     '/lembrete/api/lembretes/',
@@ -29,13 +31,13 @@ class SessionMiddleware:
     def __call__(self, request):
         try:
             req = request
-            if not req.user.is_authenticated and '/admin/' in request.META['PATH_INFO'] and '/admin/login' not in request.META['PATH_INFO']:
+            if not req.user.is_authenticated and admin_url in request.META['PATH_INFO'] and '/admin/login' not in request.META['PATH_INFO']:
                 return redirect('/admin/login')
             
             if self.valida_url(request.META['PATH_INFO']):
                 Thread(target=self.main,args=(req,)).run()
             return self.get_response(req)
-        except InterfaceError as e:
+        except InterfaceError:
             asyncio.run(self.close_connection())
             return self.get_response(req)
 
@@ -52,55 +54,50 @@ class SessionMiddleware:
         grava_log = True
         if '/core/api/general/session/UserPage/' in request.META['PATH_INFO']:
             grava_log = False
-        req = request
-        autenticado = asyncio.run(self.get_autenticado(req))
-        params = req.POST if req.POST else req.GET
+        autenticado = asyncio.run(self.get_autenticado(request))
+        params = request.POST if request.POST else request.GET
 
         dic_logrequest = {
-            'ip': req.META['REMOTE_ADDR'],
-            'ip_publico': req.META.get('HTTP_X_REAL_IP') or None,
-            'navegador': req.META['HTTP_USER_AGENT'],
-            'url_atual': req.META.get('HTTP_REFERER') or None,
-            'url': req.META['PATH_INFO'],
-            'metodo': req.method,
+            'ip': request.META['REMOTE_ADDR'],
+            'ip_publico': request.META.get('HTTP_X_REAL_IP') or None,
+            'navegador': request.META['HTTP_USER_AGENT'],
+            'url_atual': request.META.get('HTTP_REFERER') or None,
+            'url': request.META['PATH_INFO'],
+            'metodo': request.method,
             'parametros': json.dumps(params,ensure_ascii=False)
         }
 
-        if autenticado and grava_log:
-            if 'sessionid' in req.COOKIES:
-                dic_logrequest.update({'session_key':req.COOKIES['sessionid']})
-                dic_logrequest.update({'user':req.user})
-                asyncio.run(self.get_usersession(req))
-
-                asyncio.run(self.save_logrequests(dic_logrequest))
-                asyncio.run(self.verifica_preferencia(request))
-        staff = asyncio.run(self.is_staff(req))
+        if autenticado and grava_log and 'sessionid' in request.COOKIES:
+            dic_logrequest.update({'session_key':request.COOKIES['sessionid']})
+            dic_logrequest.update({'user':request.user})
+            asyncio.run(self.get_usersession(request))
+            asyncio.run(self.save_logrequests(dic_logrequest))
+            asyncio.run(self.verifica_preferencia(request))
+            
+        staff = asyncio.run(self.is_staff(request))
         if staff:
             url = ''
             try:
-                if req.META.get('HTTP_REFERER'):
-                    if '/admin/' in req.META.get('HTTP_REFERER'):
-                        url = '/admin/' + req.META.get('HTTP_REFERER').split('/admin/')[1]
-                    else:
-                        url = req.META['PATH_INFO']
+                if request.META.get('HTTP_REFERER') and admin_url in request.META.get('HTTP_REFERER'):                    
+                    url = admin_url + request.META.get('HTTP_REFERER').split(admin_url)[1]
                 else:
-                    url = req.META['PATH_INFO']
-            except:
-                url = req.META['PATH_INFO']
+                    url = request.META['PATH_INFO']
+            except Exception:
+                url = request.META['PATH_INFO']
                 
-            asyncio.run(self.save_userpage(req,url))     
+            asyncio.run(self.save_userpage(request,url))     
 
     @sync_to_async
     def save_userpage(self,request,url):
         try:
-            user_page, created = UserPage.objects.get_or_create(user = request.user,url=url)
+            user_page, _ = UserPage.objects.get_or_create(user = request.user,url=url)
             if user_page:
                 user_page.save()
-        except:
+        except Exception:
             UserPage.objects.filter(user = request.user,url=url).delete()
-            user_page, created = UserPage.objects.get_or_create(user = request.user,url=url)
+            user_page, _ = UserPage.objects.get_or_create(user = request.user,url=url)
         if user_page:
-            user_page.modificado_em = datetime.datetime.now()
+            user_page.modificado_em = timezone.now()
             user_page.save()
                 
     
@@ -120,7 +117,7 @@ class SessionMiddleware:
     def get_usersession(self,request):
         user_session = UserSession.objects.filter(user = request.user.id).first()
         if user_session:
-            user_session.modificado_em = datetime.datetime.now()
+            user_session.modificado_em = timezone.now()
             user_session.save()
         return user_session
     

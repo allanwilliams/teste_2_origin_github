@@ -156,12 +156,12 @@ class DecimalEncoder(json.JSONEncoder):
 
 def compact(*names):
     caller = inspect.stack()[1][0]
-    vars = {}
+    result = {}
 
     for n in names:
         if n in caller.f_locals:
-            vars[n] = caller.f_locals[n]
+            result[n] = caller.f_locals[n]
         elif n in caller.f_globals:
-            vars[n] = caller.f_globals[n]
-    return vars
+            result[n] = caller.f_globals[n]
+    return result
 

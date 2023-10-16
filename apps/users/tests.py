@@ -3,9 +3,11 @@ from apps.users.models import User,UserPreferencias, Defensores, Papeis, Defenso
 from apps.users.forms import UserCreationForm, UserChangeForm
 from django.conf import settings
 
+username = 'teste.user'
+
 class UserModelTest(TestCase):
     def setUp(self):
-        user = User(name="Teste User", username='teste.user',password='Dpgeceti@20xx')
+        user = User(name="Teste User", username=username,password=settings.USER_PASSWORD_TEST)
         user.save()
         self.user = user
 
@@ -49,9 +51,9 @@ class UserFormTest(TestCase):
 
     def test_valid_data(self):
         form = UserCreationForm({
-            'username':'teste.user',
-            'password1': 'Dpgeceti@20xx',
-            'password2': 'Dpgeceti@20xx',
+            'username':username,
+            'password1': settings.USER_PASSWORD_TEST,
+            'password2': settings.USER_PASSWORD_TEST,
         })
 
         self.assertTrue(form.is_valid())
@@ -61,9 +63,9 @@ class UserFormTest(TestCase):
 
     def test_duplicated_username(self):
         create_user_form = UserCreationForm({
-            'username':'teste.user',
-            'password1': 'Dpgeceti@20xx',
-            'password2': 'Dpgeceti@20xx',
+            'username':username,
+            'password1': settings.USER_PASSWORD_TEST,
+            'password2': settings.USER_PASSWORD_TEST,
         })
 
         create_user_form.is_valid()
@@ -78,9 +80,9 @@ class UserFormTest(TestCase):
 
     def test_duplicated_cpf(self):
         form1 = UserCreationForm({
-            'username':'teste.user',
-            'password1': 'Dpgeceti@20xx',
-            'password2': 'Dpgeceti@20xx',
+            'username':username,
+            'password1': settings.USER_PASSWORD_TEST,
+            'password2': settings.USER_PASSWORD_TEST,
         })
 
         form1.is_valid()
@@ -88,9 +90,9 @@ class UserFormTest(TestCase):
         form1.save()
 
         form2 = UserCreationForm({
-            'username':'teste.user',
-            'password1': 'Dpgeceti@20xx',
-            'password2': 'Dpgeceti@20xx',
+            'username':username,
+            'password1': settings.USER_PASSWORD_TEST,
+            'password2': settings.USER_PASSWORD_TEST,
         })
 
         self.assertFalse(form2.is_valid())
@@ -102,11 +104,11 @@ class PapeisModelTest(TestCase):
         self.papel = papel
 
     def test_papel_str(self):
-        self.assertTrue('Defensor',str(self.papel))
+        self.assertTrue('Defensor' in str(self.papel))
 
 class DefensorModelTest(TestCase):
     def test_defensor_str(self):
-        user = User(first_name="Teste", last_name="User", username='teste.user')
+        user = User(first_name="Teste", last_name="User", username=username)
         user.save()
 
         defensor = Defensores(nome='teste',matricula='0000',cpf='00000000000',user=user)

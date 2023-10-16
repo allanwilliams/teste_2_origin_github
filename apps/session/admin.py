@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from .models import LogRequests,UserSession
 from rangefilter.filter import DateRangeFilter
-from .functions import *
+from .functions import remover_sessao
 from pygments.formatters import HtmlFormatter
 from pygments import highlight
 from pygments.lexers import JsonLexer
@@ -32,7 +32,7 @@ class LogRequestsAdmin(admin.ModelAdmin):
             response = highlight(response, JsonLexer(), formatter)
             style = "<style>pre { width: 450px; } " + formatter.get_style_defs() + "</style><br>"
             return mark_safe(style + response)
-        except:
+        except Exception:
             return {}
         
     get_parametros.short_description = format_html('<div class="text"><a href="">PARAMETROS</a></div>')

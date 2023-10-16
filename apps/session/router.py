@@ -1,7 +1,7 @@
 class ModelMetaRouter(object):
     def db_for_read(self, model, **hints):
 
-        db = getattr(model._meta, 'in_db', None)   # use default database for models that dont have 'in_db'
+        db = getattr(model._meta, 'in_db', None)
         if db:
             return db
         else:
@@ -15,17 +15,10 @@ class ModelMetaRouter(object):
             return 'default'
 
     def allow_relation(self, obj1, obj2, **hints):
-        # only allow relations within a single database
-        # if getattr(obj1._meta, 'in_db', None) == getattr(obj2._meta, 'in_db', None):
-        #     return True
         db_set = {'default', 'in_db'}
         if obj1._state.db in db_set and obj2._state.db in db_set:
             return 'users_user'
 
-        # if obj1._meta.app_label == 'session' or \
-        #    obj2._meta.app_label == 'session':
-        #    print('asdasdjhaksjdhaksjdhkj')
-        #    return 'users_user'
         return True
 
     def allow_syncdb(self, db, model):

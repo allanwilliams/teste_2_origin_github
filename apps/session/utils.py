@@ -44,7 +44,7 @@ class PasswordChecker:
                 data_troca = ultima_troca_senha.criado_em
             else:
                 data_troca = timezone.datetime(1969,1,1,0,0,0)
-        except:
+        except Exception:
             data_troca = timezone.now()
         return data_troca
 

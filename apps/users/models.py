@@ -71,9 +71,8 @@ class User(AbstractUser):
             if not self.last_name:
                 self.last_name = name[-1]
         
-        if self.id:
-            if self.first_name:
-                self.user_str = '{:08n} {} {} ({})'.format(self.id, self.first_name, self.last_name,self.username)
+        if self.id and self.first_name:
+            self.user_str = '{:08n} {} {} ({})'.format(self.id, self.first_name, self.last_name,self.username)
         
         super(User, self).save(
             force_insert=False,
@@ -111,15 +110,8 @@ class User(AbstractUser):
 @receiver(post_save, sender=User)
 def create_app_user_str(sender, instance, created, **kwargs):
     if created:
-        if instance.name:
-            if ' ' in instance.name:
-                name = instance.name.split(' ')
-            else:
-                name = [instance.name, instance.name]
-
         instance.user_str = '{:08n} {} {} ({})'.format(instance.id, instance.first_name, instance.last_name,instance.username)
         instance.save() 
-
 
 class Papeis(BaseModel):
     titulo = models.CharField(
@@ -209,14 +201,6 @@ class DefensoresLotacoes(BaseModel):
         null=True,
         blank=True,
     )
-    # nucleo = models.ForeignKey(
-    #     'contrib.Nucleos',
-    #     verbose_name='Núcleo',
-    #     on_delete=models.DO_NOTHING,
-    #     related_name='%(class)s_nucleo',
-    #     null=True,
-    #     blank=True,
-    # )
     user = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
@@ -302,5 +286,5 @@ class TrocaSenhaUsuario(BaseModel):
                                 }
                                 grava_senha = TrocaSenhaUsuario(**dict_password)
                                 grava_senha.save()
-            except:
+            except Exception:
                 pass

@@ -34,7 +34,7 @@ cp .env_exemplo .env
 
 ## Integração com FusionAuth
 
-Caso deseje utilizar o FusionAuth os parametros abaixo deverãos ser configurados na .env
+Caso deseje utilizar o FusionAuth os parametros abaixo deverão ser configurados na .env
 ```
 [FUSIONAUTH_HOST]: Endereço do servidor do FusionAuth ex: http://127.0.0.1:9011/
 [USE_FUSIONAUTH]: Flag que habilita a integração (se for False a autenticação será feita usando Django Admin convencional)

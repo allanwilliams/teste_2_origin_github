@@ -79,12 +79,11 @@ class RepeticaoCase:
         quantidade_repeticoes = self.min_length
         invalid = True
         for i in range(quantidade_repeticoes, tamanho):
-            repeticoes_consecutivas = True
             for j in range(quantidade_repeticoes):
                 if password[i - j] != password[i]:
                     break
-            if repeticoes_consecutivas:
-                invalid =  False
+            
+            invalid =  False
                 
         if invalid:
             raise ValidationError(

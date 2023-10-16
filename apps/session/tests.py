@@ -10,12 +10,14 @@ from apps.session.admin import UserSessionAdmin, LogRequestsAdmin
 from apps.session.functions import remover_sessao
 from django.contrib.auth.password_validation import validate_password
 
+username = 'teste.user'
+name = "Teste User"
 class SessionModelTest(TestCase):
     def setUp(self):
-        user = User(name="Teste User", username='teste.user',password='Dpgeceti@20xx',is_staff=True)
+        user = User(name=name, username=username,password=settings.USER_PASSWORD_TEST,is_staff=True)
         user.save()
 
-        self.client.login(username='teste.user',password='Dpgeceti@20xx')
+        self.client.login(username=username,password=settings.USER_PASSWORD_TEST)
         session_django = Session.objects.filter(session_key=self.client.session.session_key).first()
 
         session = UserSession(
@@ -28,17 +30,17 @@ class SessionModelTest(TestCase):
         self.session = session
 
     def test_online(self):
-        self.client.login(username='teste.user',password='Dpgeceti@20xx')
+        self.client.login(username=username,password=settings.USER_PASSWORD_TEST)
 
         session = UserSession.objects.filter(user=self.user).first()
         self.assertTrue(session.time_online())
 
 class SessionAdminTest(TestCase):
     def setUp(self):
-        user = User(name="Teste User", username='teste.user',password='Dpgeceti@20xx',is_staff=True)
+        user = User(name=name, username=username,password=settings.USER_PASSWORD_TEST,is_staff=True)
         user.save()
 
-        self.client.login(username='teste.user',password='Dpgeceti@20xx')
+        self.client.login(username=username,password=settings.USER_PASSWORD_TEST)
         
         session_django = Session.objects.filter(session_key=self.client.session.session_key).first()
 
@@ -145,7 +147,7 @@ class LogRequestAdminTest(TestCase):
 
 class PasswordValidationTest(TestCase):
     def setUp(self):
-        user = User(name="Teste User", username='teste.user',password='Dpgeceti@20xx',is_staff=True)
+        user = User(name=name, username=username,password=settings.USER_PASSWORD_TEST,is_staff=True)
         user.save()
 
         self.user = user
@@ -153,14 +155,14 @@ class PasswordValidationTest(TestCase):
     def test_validate_password_with_fusionauth(self):
         settings.USE_FUSIONAUTH = True
         try:
-            validate_password('Dpgeceti@20xx')
+            validate_password(settings.USER_PASSWORD_TEST)
         except ValidationError as e:
             self.fail(f'{e}')
 
     def test_validate_password(self):
         settings.USE_FUSIONAUTH = False
         try:
-            validate_password('Dpgeceti@20xx')
+            validate_password(settings.USER_PASSWORD_TEST)
         except ValidationError as e:
             self.fail(f'{e}')
 
@@ -182,7 +184,7 @@ class PasswordValidationTest(TestCase):
             # com senha antiga
             self.user.set_password('Dpgeceti@20xy')
             self.user.save()
-            self.user.set_password('Dpgeceti@20xx')
+            self.user.set_password(settings.USER_PASSWORD_TEST)
             self.user.save()
-            validate_password('Dpgeceti@20xx',self.user)
+            validate_password(settings.USER_PASSWORD_TEST,self.user)
         
