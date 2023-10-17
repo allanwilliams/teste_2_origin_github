@@ -80,14 +80,13 @@ class UserFormTest(TestCase):
 
     def test_duplicated_cpf(self):
         form1 = UserCreationForm({
-            'username':username,
+            'username': username,
             'password1': settings.USER_PASSWORD_TEST,
             'password2': settings.USER_PASSWORD_TEST,
         })
 
-        form1.is_valid()
-
-        form1.save()
+        if form1.is_valid():
+            form1.save()
 
         form2 = UserCreationForm({
             'username':username,
