@@ -92,3 +92,5 @@ media/
 staticfiles/
 
 tests/
+
+.scannerwork

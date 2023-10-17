@@ -77,7 +77,7 @@ source venv/bin/activate
 Executando todos dos testes
 
 ```
-coverage run manage.py test apps; coverage html --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" -d tests/coverage
+coverage run --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" manage.py test apps --settings config.cicd_settings;coverage html --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" -d tests/coverage; coverage xml -i
 ```
 
 Executando testes por app
