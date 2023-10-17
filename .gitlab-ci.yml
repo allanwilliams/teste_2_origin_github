@@ -4,14 +4,8 @@ stages:
 UnitTest:
   image: python:3.8.10
   stage: test
-  services:
-    - postgres:12.2-alpine
-  variables:
-    POSTGRES_DB: tests
-    POSTGRES_USER: postgres
-    POSTGRES_PASSWORD: postgres
   before_script:
-    - export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB
+    - export DJANGO_READ_DOT_ENV_FILE=True
     - pip install -r requirements.txt
   script:
     - coverage run --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" manage.py test apps --settings config.cicd_settings
