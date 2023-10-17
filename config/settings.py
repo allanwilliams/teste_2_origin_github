@@ -40,25 +40,23 @@ ALLOWED_HOSTS =  env("ALLOWED_HOSTS", default=['localhost'])
 # Application definition
 
 DJANGO_APPS = [
-    'adminlteui',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+    'treebeard',
+    'rangefilter',
 ]
 
 THIRD_PARTY_APPS = [
+    "adminlteui.apps.AdminlteUIConfig",
     'mozilla_django_oidc',
     "corsheaders",
-    'treebeard',
     'rest_framework',
     'rest_framework_simplejwt',
-    'rangefilter',
     "reversion",
-    
 ]
 
 LOCAL_APPS = [
