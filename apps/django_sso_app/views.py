@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages, auth
+from django.views.decorators.http import require_http_methods
 from apps.django_sso_app.forms import AdminPasswordChangeForm
 
+@require_http_methods(["GET","POST"])
 def change_password(request):
     form = AdminPasswordChangeForm(request.user)
     
@@ -10,7 +12,7 @@ def change_password(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Senha atualizada com sucesso')
-            return redirect(f'/admin/')
+            return redirect('/admin/')
 
     context = {
         'form': form
@@ -18,14 +20,18 @@ def change_password(request):
 
     return render(request,'django_sso_app/sso_change_password.html',context)
 
+@require_http_methods(["GET"])
 def login(request):
-    if request.user.is_authenticated:
-        if request.user.is_staff:
-            return redirect(f'/admin/')
-        else:
-            return redirect('django_sso_unauthorized')
-    return redirect('oidc_authentication_init')
-
+    if request.method == 'GET':
+        if request.user.is_authenticated:
+            if request.user.is_staff:
+                return redirect('/admin/')
+            else:
+                return redirect('django_sso_unauthorized')
+        return redirect('oidc_authentication_init')
+    
+@require_http_methods(["GET"])
 def unauthorized(request):
-    auth.logout(request)
-    return render(request,'django_sso_app/unauthorized.html')
+    if request.method == 'GET':
+        auth.logout(request)
+        return render(request,'django_sso_app/unauthorized.html')
