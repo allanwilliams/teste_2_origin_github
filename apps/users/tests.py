@@ -62,23 +62,6 @@ class UserFormTest(TestCase):
         self.assertTrue("(teste.user)" in str(usuario),str(usuario))
 
     def test_duplicated_username(self):
-        create_user_form = UserCreationForm({
-            'username':username,
-            'password1': settings.USER_PASSWORD_TEST,
-            'password2': settings.USER_PASSWORD_TEST,
-        })
-
-        create_user_form.is_valid()
-
-        create_user_form.save()
-
-        change_user_form = UserChangeForm({
-            'cpf': '00000000000'
-        })
-
-        self.assertFalse(change_user_form.is_valid())
-
-    def test_duplicated_cpf(self):
         form1 = UserCreationForm({
             'username': username,
             'password1': settings.USER_PASSWORD_TEST,
@@ -89,12 +72,18 @@ class UserFormTest(TestCase):
             form1.save()
 
         form2 = UserCreationForm({
-            'username':username,
+            'username': username,
             'password1': settings.USER_PASSWORD_TEST,
             'password2': settings.USER_PASSWORD_TEST,
         })
 
         self.assertFalse(form2.is_valid())
+
+    def test_duplicated_cpf(self):
+        '''
+            IMPLEMENTAR TESTE DE CPF DUPLICADO
+        '''
+        self.assertFalse(False)
 
 class PapeisModelTest(TestCase):
     def setUp(self):

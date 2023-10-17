@@ -263,7 +263,7 @@ ADMINLTE_SETTINGS = {
 #FusionAuth CONFIGS
 # The below config values should be taken from FusionAuth application
 USE_FUSIONAUTH = env("USE_FUSIONAUTH",default=False)
-USER_PASSWORD_TEST = env("USER_PASSWORD_TEST",default='')
+USER_PASSWORD_TEST = env("USER_PASSWORD_TEST",default='Dpgeceti@20xx')
 
 if USE_FUSIONAUTH:
     FUSIONAUTH_HOST = env("FUSIONAUTH_HOST",default="http://127.0.0.1:9011/")
