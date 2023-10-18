@@ -19,6 +19,9 @@ import environ
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+ROOT_DIR = (environ.Path(__file__) - 1)
+APPS_DIR = ROOT_DIR.path("apps")
+
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False)

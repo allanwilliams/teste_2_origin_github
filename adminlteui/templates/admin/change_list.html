@@ -65,7 +65,9 @@
                             {% endblock %}
 
                             {% block object-tools %}
-                            <div {% if cl.has_filters or cl.search_fields %}class="col-md-2 col-sm-12 col-xs-12 text-right"{% else %}class="col-md-12 text-right"{% endif %}>
+                            <div style='gap: 1em' {% if cl.has_filters or cl.search_fields %}class="display-botton-search"{% else %}class="display-botton-search"{% endif %}>
+                                {% block btn-functions %}
+                                {% endblock %}
                                 {% block object-tools-items %}
                                 {% change_list_object_tools %}
                                 {% endblock %}

@@ -1,6 +1,7 @@
 from django.contrib.auth import forms, get_user_model
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+from django import forms as django_forms
 
 User = get_user_model()
 
@@ -40,3 +41,6 @@ class UserCreationForm(forms.UserCreationForm):
             return username
 
         raise ValidationError(self.error_messages["duplicate_username"])
+
+class ImportarUsuariosForm(django_forms.Form):
+    file = django_forms.FileField()

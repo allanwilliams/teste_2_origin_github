@@ -27,15 +27,18 @@ class MyAuthenticationBackend(OIDCAuthenticationBackend):
     # Usa as roles de grupos para determinar os grupos do usuário
     def handle_groups(self,user,roles):
         roles = self.get_roles(roles,'GRUPO')
+        
         if roles:
             for ugp in user.groups.all():
                 if ugp.name not in roles:
                     user.groups.remove(ugp)
-
             for groupr in roles:
                 group = Group.objects.filter(name=groupr).first()
                 if group:
                     user.groups.add(group)
+        else:
+            for ugp in user.groups.all():
+                user.groups.remove(ugp)
 
     # Usa as roles de papel para determinar os grupos do usuário
     def handle_papeis(self,user,roles):

@@ -13,6 +13,7 @@ urlpatterns = [
     path('django_sso_app/', include('apps.django_sso_app.urls')),
     path('core/', include('apps.core.urls')),
     path('oidc/', include('mozilla_django_oidc.urls')),
+    path("users/", include("apps.users.urls", namespace="users")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(
     settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

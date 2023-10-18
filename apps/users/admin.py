@@ -42,6 +42,7 @@ class UserAdmin(auth_admin.UserAdmin):
     list_display = ["name", "papel", "is_superuser"]
     list_filter = ['papel']
     search_fields = ["name",]
+    change_list_template = 'user_changelist_template.html'
 
 
 @admin.register(Defensores)
