@@ -89,13 +89,16 @@ class SessionMiddleware:
 
     @sync_to_async
     def save_userpage(self,request,url):
+        user_page = ''
         try:
             user_page, _ = UserPage.objects.get_or_create(user = request.user,url=url)
             if user_page:
                 user_page.save()
         except Exception:
-            UserPage.objects.filter(user = request.user,url=url).delete()
-            user_page, _ = UserPage.objects.get_or_create(user = request.user,url=url)
+            try:
+                UserPage.objects.filter(user = request.user,url=url).delete()
+                user_page, _ = UserPage.objects.get_or_create(user = request.user,url=url)
+            except Exception: pass
         if user_page:
             user_page.modificado_em = timezone.now()
             user_page.save()
@@ -106,8 +109,10 @@ class SessionMiddleware:
     
     @sync_to_async
     def save_logrequests(self,dic_logrequest):
-        session = LogRequests(**dic_logrequest)
-        session.save()
+        try:
+            session = LogRequests(**dic_logrequest)
+            session.save()
+        except Exception: pass
 
     @sync_to_async
     def get_autenticado(self,request):
@@ -115,11 +120,14 @@ class SessionMiddleware:
 
     @sync_to_async
     def get_usersession(self,request):
-        user_session = UserSession.objects.filter(user = request.user.id).first()
-        if user_session:
-            user_session.modificado_em = timezone.now()
-            user_session.save()
-        return user_session
+        try:
+            user_session = UserSession.objects.filter(user = request.user.id).first()
+            if user_session:
+                user_session.modificado_em = timezone.now()
+                user_session.save()
+            return user_session
+
+        except Exception: pass
     
     @sync_to_async
     def close_connection(self):
