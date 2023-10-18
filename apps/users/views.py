@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required,permission_required
 from django.contrib.auth.models import Group
-from config.settings import BASE_DIR, USE_FUSIONAUTH
+from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from apps.users.forms import ImportarUsuariosForm
 from apps.users.models import Papeis
@@ -28,7 +28,7 @@ def importar_usuarios(request):
             filename = fs.save(arquivo.name, arquivo )
             uploaded_file_url = fs.url(filename)
             diretorio = os.path.dirname(os.path.dirname(filename))
-            diretorio_arquivo = '{}{}{}'.format(BASE_DIR,diretorio,uploaded_file_url)
+            diretorio_arquivo = '{}{}{}'.format(settings.BASE_DIR,diretorio,uploaded_file_url)
             with open(diretorio_arquivo, encoding='utf-8') as f:
                 csv_reader = csv.reader(f, delimiter=';')
                 csv_reader.__next__()
@@ -88,7 +88,7 @@ def importar_usuarios(request):
                             'papel_id': papel,
                             'password': password
                         }
-                        if USE_FUSIONAUTH:
+                        if settings.USE_FUSIONAUTH:
                             fusionauth_users.append(user_data)
 
                         if matricula:
