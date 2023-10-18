@@ -1,4 +1,4 @@
-from config.settings import FUSIONAUTH_HOST, FUSIONAUTH_USER_API_KEY, OIDC_RP_CLIENT_ID
+from django.conf import settings
 from apps.users.models import Papeis
 import requests
 
@@ -22,7 +22,7 @@ def import_user(users):
             'username': user.get('username'),
             'registrations': [
                 {
-                'applicationId': OIDC_RP_CLIENT_ID,
+                'applicationId': settings.OIDC_RP_CLIENT_ID,
                 'roles': roles,
                 'verified': True
                 }
@@ -30,13 +30,13 @@ def import_user(users):
             'verified': True,
         }
 
-        api_url = FUSIONAUTH_HOST + '/api/user'
+        api_url = settings.FUSIONAUTH_HOST + '/api/user'
         data_user = {
             'user': new_user,
             'validateDbConstraints': True
         }
 
-        headers = { 'Content-Type': 'application/json', 'Authorization': FUSIONAUTH_USER_API_KEY }
+        headers = { 'Content-Type': 'application/json', 'Authorization': settings.FUSIONAUTH_USER_API_KEY }
         response = requests.post(url=api_url,json=data_user,headers=headers)
 
         if response.status_code != 200:
@@ -60,12 +60,12 @@ def update_user(user_to_update,user_data):
     registration = user_to_update.get('registrations')[0]
 
 
-    api_url = FUSIONAUTH_HOST + f'/api/user/registration/{user_id}'
+    api_url = settings.FUSIONAUTH_HOST + f'/api/user/registration/{user_id}'
     data_user = {
         'registration': registration,
     }
 
-    headers = { 'Content-Type': 'application/json', 'Authorization': FUSIONAUTH_USER_API_KEY }
+    headers = { 'Content-Type': 'application/json', 'Authorization': settings.FUSIONAUTH_USER_API_KEY }
     response = requests.post(url=api_url,json=data_user,headers=headers)
 
     if response.status_code != 200:
@@ -76,11 +76,11 @@ def update_user(user_to_update,user_data):
         
 
 def search_user(user_email):
-    api_url = FUSIONAUTH_HOST + f'/api/user?email={user_email}'
+    api_url = settings.FUSIONAUTH_HOST + f'/api/user?email={user_email}'
 
-    headers = { 'Content-Type': 'application/json', 'Authorization': FUSIONAUTH_USER_API_KEY }
+    headers = { 'Content-Type': 'application/json', 'Authorization': settings.FUSIONAUTH_USER_API_KEY }
     response = requests.get(url=api_url,headers=headers)
-    
+
     if response.status_code == 200:
         data = response.json()
         return data
