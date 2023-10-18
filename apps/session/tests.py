@@ -1,6 +1,6 @@
 from django.test import TestCase,RequestFactory
 from django.contrib.admin.sites import AdminSite
-from apps.users.models import User
+from apps.users.models import User, Papeis
 from django.utils import timezone
 from django.contrib.sessions.models import Session
 from django.core.exceptions import ValidationError
@@ -187,4 +187,39 @@ class PasswordValidationTest(TestCase):
             self.user.set_password(settings.USER_PASSWORD_TEST)
             self.user.save()
             validate_password(settings.USER_PASSWORD_TEST,self.user)
-        
+class MiddlewareTest(TestCase):
+    def setUp(self):
+        user = User(name='name', username=username,password=settings.USER_PASSWORD_TEST,is_staff=True,is_superuser=True)
+        user.save()
+        self.user = user
+
+        session_django = Session.objects.filter(session_key=self.client.session.session_key).first()
+
+        session = UserSession(
+            user=user,
+            session=session_django,
+            modificado_em=timezone.now())
+        session.save()
+
+    def test_access_page_not_authenticated(self):
+        user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'
+        response = self.client.post('/admin/',HTTP_USER_AGENT=user_agent)
+        self.assertEqual(response.status_code, 302)
+
+    def test_access_userpage(self):
+        self.client.force_login(user=self.user)
+        user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'
+        response = self.client.get('/core/api/general/session/UserPage/',HTTP_USER_AGENT=user_agent)
+        self.assertEqual(response.status_code, 200,response)
+
+    def test_access_blocklog_url(self):
+        self.client.force_login(user=self.user)
+        user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'
+        response = self.client.get('/core/api/general/',HTTP_USER_AGENT=user_agent)
+        self.assertEqual(response.status_code, 200,response)
+
+    def test_access_log_url(self):
+        self.client.force_login(user=self.user)
+        user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'
+        response = self.client.get('/admin/users/',HTTP_USER_AGENT=user_agent)
+        self.assertEqual(response.status_code, 200,response)

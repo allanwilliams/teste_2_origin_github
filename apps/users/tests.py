@@ -126,6 +126,9 @@ class UserImportTest(TestCase):
 
 class PapeisModelTest(TestCase):
     def setUp(self):
+        user = User(name='name', username=username,password=settings.USER_PASSWORD_TEST,is_staff=True)
+        user.save()
+
         papel = Papeis(id=1,titulo='Defensor')
         papel.save()
         self.papel = papel
@@ -144,6 +147,9 @@ class DefensorModelTest(TestCase):
 
 class DefensoresLotacoesModelTest(TestCase):
     def setUp(self):
+        user = User(name='name', username=username,password=settings.USER_PASSWORD_TEST,is_staff=True)
+        user.save()
+
         from datetime import datetime
         defensor_lotacao = DefensoresLotacoes(
             defensor_nome='teste',

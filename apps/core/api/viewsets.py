@@ -49,7 +49,7 @@ class GeneralViewSet(ModelViewSet):
             object_pk = self.kwargs.get('id')
             if object_pk:
                 return self.model.objects.filter(pk=object_pk)
-            if self.request.GET:
+            if self.request.method == 'GET':
                 result = self.model.objects.filter(pk__gte=0)
                 for param in self.request.GET:
                     try:
