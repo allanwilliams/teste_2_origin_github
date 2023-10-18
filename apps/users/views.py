@@ -33,88 +33,16 @@ def importar_usuarios(request):
                 csv_reader = csv.reader(f, delimiter=';')
                 csv_reader.__next__()
                 for row in csv_reader:
-                    nome = row[0]
-                    cpf = row[1]
-                    matricula = row[2]
-                    papel = row[3]
-                    username = row[4]
-                    email = row[5]
-                    grupo = row[6]
-                    staff = row[7]
+                    result = processar_linha_csv(row)
 
-                    if not matricula:
-                        matricula: None
-                        
-                    result_data = {
-                        'nome': nome,
-                        'cpf': cpf,
-                        'matricula': matricula,
-                        'papel': papel,
-                        'username': username,
-                        'email': email,
-                        'grupo': grupo,
-                        'staff': True if staff == 'True' else False
-                    }
+                    if settings.USE_FUSIONAUTH:
+                        fusionauth_users.append(result['user_data'])
 
-                    cpf_clear = re.sub('[^0-9]', '', cpf)
-
-                    usuario_multi_existe = User.objects.filter(username=username.strip()).exists()
-                    email_existe = User.objects.filter(email=email.strip()).exists()
-                    
-                    matricula_multi_existe = False
-                    if matricula:
-                        matricula_multi_existe = User.objects.filter(matricula=matricula.strip()).exists()
-                    
-                    cpf_multi_existe = False
-                    if cpf_clear:    
-                        cpf_multi_existe =  User.objects.filter(cpf=cpf_clear.strip()).exists()
-
-                    if usuario_multi_existe or cpf_multi_existe or email_existe or matricula_multi_existe:
-                        result_data['status'] = 'danger'
-                        result_data['status_mensagem'] = 'Não importado. Já existe um usuário cadastrado com esse username, email, cpf ou matricula'
-                    else:
-                        password = '{}!U'.format(cpf_clear.strip()[:7])
-
-                        user_data = {
-                            'is_superuser': False,
-                            'username': username,
-                            'first_name':  nome.split()[0] if len(nome.split()) > 0 else '',
-                            'last_name': nome.split()[-1] if len(nome.split()) > 1 else '',
-                            'email': email.strip(),
-                            'is_staff': staff,
-                            'is_active': True,
-                            'date_joined': datetime.now(),
-                            'name': nome.strip(),
-                            'papel_id': papel,
-                            'password': password
-                        }
-                        if settings.USE_FUSIONAUTH:
-                            fusionauth_users.append(user_data)
-
-                        if matricula:
-                            user_data['matricula'] = matricula
-                        
-                        if cpf_clear:
-                            user_data['cpf'] = cpf_clear
-
-
-                        user = User(**user_data)
-
-                        user.set_password(password)
-                        user.save()
-                        group = Group.objects.get(pk=grupo)
-                        user.groups.add(group)
-
+                    result_data = result['result_data']
                     data.append(result_data)
             
             if len(fusionauth_users) > 0:
-                result_import_fusion = import_user(fusionauth_users)
-                if result_import_fusion:
-                    for result_error in result_import_fusion:
-                        for index, item in enumerate(data):
-                            if item['email'] == result_error['user_email']:
-                                data[index]['status'] = 'danger'
-                                data[index]['status_mensagem'] = result_error['error']
+                data = processar_usuarios_fusionauth(fusionauth_users,data)
 
             fs.delete(arquivo.name)
             mensagem = 'Upload realizado com sucesso!'
@@ -129,3 +57,90 @@ def importar_usuarios(request):
     }
 
     return render(request, 'importar_usuarios.html', context)
+
+def processar_usuarios_fusionauth(fusionauth_users,data):
+    if len(fusionauth_users) > 0:
+        result_import_fusion = import_user(fusionauth_users)
+        if result_import_fusion:
+            for result_error in result_import_fusion:
+                for index, item in enumerate(data):
+                    if item['email'] == result_error['user_email']:
+                        data[index]['status'] = 'danger'
+                        data[index]['status_mensagem'] = result_error['error']
+
+    return data
+
+def processar_linha_csv(row):
+    nome = row[0]
+    cpf = row[1]
+    matricula = row[2]
+    papel = row[3]
+    username = row[4]
+    email = row[5]
+    grupo = row[6]
+    staff = row[7]
+
+    if not matricula:
+        matricula: None
+        
+    result_data = {
+        'nome': nome,
+        'cpf': cpf,
+        'matricula': matricula,
+        'papel': papel,
+        'username': username,
+        'email': email,
+        'grupo': grupo,
+        'staff': True if staff == 'True' else False
+    }
+
+    cpf_clear = re.sub(r"\D", '', cpf)
+
+    usuario_multi_existe = User.objects.filter(username=username.strip()).exists()
+    email_existe = User.objects.filter(email=email.strip()).exists()
+    
+    matricula_multi_existe = False
+    if matricula:
+        matricula_multi_existe = User.objects.filter(matricula=matricula.strip()).exists()
+    
+    cpf_multi_existe = False
+    if cpf_clear:    
+        cpf_multi_existe =  User.objects.filter(cpf=cpf_clear.strip()).exists()
+
+    if usuario_multi_existe or cpf_multi_existe or email_existe or matricula_multi_existe:
+        result_data['status'] = 'danger'
+        result_data['status_mensagem'] = 'Não importado. Já existe um usuário cadastrado com esse username, email, cpf ou matricula'
+    else:
+        password = '{}!U'.format(cpf_clear.strip()[:7])
+
+        user_data = {
+            'is_superuser': False,
+            'username': username,
+            'first_name':  nome.split()[0] if len(nome.split()) > 0 else '',
+            'last_name': nome.split()[-1] if len(nome.split()) > 1 else '',
+            'email': email.strip(),
+            'is_staff': staff,
+            'is_active': True,
+            'date_joined': datetime.now(),
+            'name': nome.strip(),
+            'papel_id': papel,
+            'password': password
+        }
+        
+        if matricula:
+            user_data['matricula'] = matricula
+        
+        if cpf_clear:
+            user_data['cpf'] = cpf_clear
+
+
+        user = User(**user_data)
+
+        user.set_password(password)
+        user.save()
+        group = Group.objects.get(pk=grupo)
+        user.groups.add(group)
+    return {
+        'user_data': user_data,
+        'result_data': result_data
+    }

@@ -87,7 +87,7 @@ class UserFormTest(TestCase):
         '''
             IMPLEMENTAR TESTE DE CPF DUPLICADO
         '''
-        self.assertFalse(False)
+        pass
 
 class UserImportTest(TestCase):
     def setUp(self):
