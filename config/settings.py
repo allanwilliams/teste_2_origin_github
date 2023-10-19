@@ -51,6 +51,7 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
     'treebeard',
     'rangefilter',
+    'ajax_select'
 ]
 
 THIRD_PARTY_APPS = [
