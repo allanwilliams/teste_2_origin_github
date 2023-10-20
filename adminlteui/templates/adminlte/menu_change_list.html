@@ -33,7 +33,6 @@
     $(function () {
         $('#exchange_menu').click(function () {
             $.get('{% url "admin:exchange_menu" %}', function (response) {
-                console.log(response);
                 if (response.message === 'success') {
                     window.location.reload();
                 }

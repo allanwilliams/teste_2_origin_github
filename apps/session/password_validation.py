@@ -11,7 +11,7 @@ class UpperCase:
         self.min_length = min_length
         
     def validate(self, password, user=None):
-        if settings.USE_FUSIONAUTH:
+        if settings.USE_FUSIONAUTH: # pragma: no cover
             return
         
         invalid = True
@@ -41,7 +41,7 @@ class SpecialCase:
         self.min_length = min_length
         
     def validate(self, password, user=None):
-        if settings.USE_FUSIONAUTH:
+        if settings.USE_FUSIONAUTH: # pragma: no cover
             return
         
         invalid = True
@@ -72,7 +72,7 @@ class RepeticaoCase:
         self.min_length = min_length
         
     def validate(self, password, user=None):
-        if settings.USE_FUSIONAUTH:
+        if settings.USE_FUSIONAUTH: # pragma: no cover
             return
         
         tamanho = len(password)
@@ -100,7 +100,7 @@ class RepeticaoCase:
         
 class AcentoCase:
     def validate(self, password, user=None):
-        if settings.USE_FUSIONAUTH:
+        if settings.USE_FUSIONAUTH: # pragma: no cover
             return
         
         padrao = re.compile(r'[á-â-ã-é-ê-í-ï-ó-ô-õ-ö-ú-ç-ñ-Á-Â-Ã-É-Í-Ï-Ó-Ô-Õ-Ö-Ú]+')
@@ -120,7 +120,7 @@ class OldPassword:
         self.min_length = min_length
         
     def validate(self, password, user=None):
-        if settings.USE_FUSIONAUTH:
+        if settings.USE_FUSIONAUTH: # pragma: no cover
             return
         
         if not user:

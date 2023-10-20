@@ -13,7 +13,7 @@ from django.utils.safestring import mark_safe
 class LogRequestsAdmin(admin.ModelAdmin):
     search_fields = ('user__name','url', )
     list_filter = ('user__name',('data_hora', DateRangeFilter),)
-    list_display = ('user','ip_publico','url_atual','url','metodo','get_parametros','data_hora','tempo')
+    list_display = ('user','ip_publico','url_atual','url','metodo','get_parametros','data_hora')
         
     def has_add_permission(self, request, obj=None):
         return False

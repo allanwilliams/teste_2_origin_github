@@ -43,7 +43,6 @@ def get_custom_menu(request, position):
     :return:
     """
     all_permissions = request.user.get_all_permissions()
-    # print(all_permissions)
     limit_for_internal_link = []
     for permission in all_permissions:
         app_label = permission.split('.')[0]

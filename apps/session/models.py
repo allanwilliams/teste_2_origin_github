@@ -30,6 +30,7 @@ def _update_session_auth_hash(request, user):
 dAuth.update_session_auth_hash = _update_session_auth_hash
 
 class LogRequests(models.Model):
+    DEFAULT_NAO_OBTIDO = 'Não obtido'
     cols = {
         'url': 2,
     }
@@ -41,17 +42,17 @@ class LogRequests(models.Model):
         null=True,
         blank=True
     )
-    session_key = models.CharField(max_length=300,blank=True)
-    ip = models.CharField(max_length=20,blank=True)
-    ip_publico = models.CharField(max_length=20,blank=True)
-    navegador = models.CharField(max_length=300,blank=True)
-    url = models.CharField(max_length=300,blank=True)
-    url_atual = models.CharField(max_length=500,blank=True)
+    session_key = models.CharField(max_length=300,blank=True,default=DEFAULT_NAO_OBTIDO)
+    ip = models.CharField(max_length=20,blank=True,default=DEFAULT_NAO_OBTIDO)
+    ip_publico = models.CharField(max_length=20,blank=True,default=DEFAULT_NAO_OBTIDO)
+    navegador = models.CharField(max_length=300,blank=True,default=DEFAULT_NAO_OBTIDO)
+    url = models.CharField(max_length=300,blank=True,default=DEFAULT_NAO_OBTIDO)
+    url_atual = models.CharField(max_length=500,blank=True,default=DEFAULT_NAO_OBTIDO)
     data_hora = models.DateTimeField(blank=True, null=True, auto_now_add=True)
-    metodo  = models.CharField(max_length=10,blank=True)
-    parametros  = models.TextField(blank=True)
-    response = models.TextField(blank=True)
-    tempo = models.FloatField(blank=True)
+    metodo  = models.CharField(max_length=10,blank=True,default=DEFAULT_NAO_OBTIDO)
+    parametros  = models.TextField(blank=True,default=DEFAULT_NAO_OBTIDO)
+    response = models.TextField(blank=True,default=DEFAULT_NAO_OBTIDO)
+    
 
 class UserSession(BaseModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

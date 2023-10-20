@@ -34,14 +34,15 @@ def importar_usuarios(request):
                 csv_reader.__next__()
                 for row in csv_reader:
                     result = processar_linha_csv(row)
+                    if result:
+                        if settings.USE_FUSIONAUTH: # pragma: no cover
+                            if result['user_data']:
+                                fusionauth_users.append(result['user_data'])
 
-                    if settings.USE_FUSIONAUTH:
-                        fusionauth_users.append(result['user_data'])
-
-                    result_data = result['result_data']
-                    data.append(result_data)
+                        result_data = result['result_data']
+                        data.append(result_data)
             
-            if len(fusionauth_users) > 0:
+            if len(fusionauth_users) > 0: # pragma: no cover
                 data = processar_usuarios_fusionauth(fusionauth_users,data)
 
             fs.delete(arquivo.name)
@@ -58,7 +59,7 @@ def importar_usuarios(request):
 
     return render(request, 'importar_usuarios.html', context)
 
-def processar_usuarios_fusionauth(fusionauth_users,data):
+def processar_usuarios_fusionauth(fusionauth_users,data): # pragma: no cover
     if len(fusionauth_users) > 0:
         result_import_fusion = import_user(fusionauth_users)
         if result_import_fusion:
@@ -140,7 +141,12 @@ def processar_linha_csv(row):
         user.save()
         group = Group.objects.get(pk=grupo)
         user.groups.add(group)
+
+        return {
+            'user_data': user_data,
+            'result_data': result_data
+        }
     return {
-        'user_data': user_data,
-        'result_data': result_data
+        'user_data':{},
+        'result_data':result_data
     }

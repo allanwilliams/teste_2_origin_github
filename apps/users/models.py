@@ -9,6 +9,8 @@ from django_currentuser.middleware import get_current_authenticated_user
 from apps.users.choices import  CHOICES_SEXO_USER
 from apps.core.mixins import BaseModel
 from django.utils import timezone
+from django.core import serializers
+import json
 
 class User(AbstractUser):
     PAPEL_DEFENSOR = 1
@@ -54,6 +56,8 @@ class User(AbstractUser):
                                default=0,)
     user_str = models.CharField('User String',
                                 blank=True, null=True, max_length=200)
+    
+    fusionauth_user_id = models.CharField('FusionAuth user ID',max_length=50,blank=True, null=True)
   
 		    
     def save(self,
@@ -80,10 +84,38 @@ class User(AbstractUser):
             using=None,
             update_fields=None,
         )
+        if settings.USE_FUSIONAUTH and self.fusionauth_user_id: # pragma: no cover
+            self.save_userdata()
+            self.save_userfusionauth()
+            
+    def save_userdata(self): # pragma: no cover
+        my_json = json.loads(self.model_to_json())[0]['fields']
+        for field in list(my_json):
+            if field not in self.userdata_list_fields():
+                del my_json[field]
+        
+        from apps.django_sso_app.helpers import update_userdata
+        update_userdata(my_json,self.fusionauth_user_id)
+
+    def save_userfusionauth(self): # pragma: no cover
+        from apps.django_sso_app.helpers import update_user_by_id
+        data = {
+            "firstName": self.first_name,
+            "fullName": self.name,
+            "lastName": self.last_name
+        }
+        update_user_by_id(data,self.fusionauth_user_id)
+
+    def model_to_json(self): # pragma: no cover
+        return serializers.serialize('json', [self])
 
     def __str__(self):
         return '{:08n} {} {} ({})'.format(self.id, self.first_name or '', self.last_name or '', self.username)
 
+    def userdata_list_fields(self): # pragma: no cover
+        return [
+            'cpf',
+        ]
 
     def is_defensor(self):
         if self.papel_id in (self.PAPEL_DEFENSOR,):

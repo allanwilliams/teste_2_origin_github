@@ -1,6 +1,7 @@
 from mozilla_django_oidc.auth import OIDCAuthenticationBackend
 from django.contrib.auth.models import Group
 from apps.users.models import Papeis
+from apps.django_sso_app.helpers import get_user
 import re
 
 class MyAuthenticationBackend(OIDCAuthenticationBackend):
@@ -51,6 +52,11 @@ class MyAuthenticationBackend(OIDCAuthenticationBackend):
 
     # configura o usuário com base nas roles recebidas
     def manager_user(self,user, claims):
+        sub = claims.get('sub','')
+        if sub:
+            self.populate_additional_userdata(sub,user)
+            user.fusionauth_user_id = sub
+            
         user.first_name = claims.get('given_name', '')
         user.last_name = claims.get('family_name', '')
         user.name = claims.get('name', '')
@@ -64,6 +70,15 @@ class MyAuthenticationBackend(OIDCAuthenticationBackend):
             self.handle_groups(user,roles)
             self.handle_papeis(user,roles)
     
+    def populate_additional_userdata(self,sub,user):
+        fusion_user = get_user(sub)
+        if fusion_user:
+            userdata = fusion_user['user']['data']
+            if userdata:
+                for data in userdata:
+                    if hasattr(user,data):
+                        setattr(user,data,userdata[data])
+                user.save()
 
     def create_user(self, claims):
         user = super(MyAuthenticationBackend, self).create_user(claims)

@@ -608,7 +608,6 @@ $(function() {
     for (var j in topMenuActions) {
         if (window.location.href.indexOf(topMenuActions[j].href) !== -1) {
             topMenuActions[j].parentNode.setAttribute('class', 'active');
-            console.log('top menu matched.', window.location.href, topMenuActions[j].href);
         }
     }
 
@@ -624,11 +623,9 @@ $(function() {
     });
     function removeSelect2() {
         $('select:not(.filtered):not(.admin-autocomplete)').select2('destroy');
-        console.log('removeSelect2');
     };
     function appendSelect2() {
         $('select:not(.filtered):not(.admin-autocomplete)').select2({dropdownAutoWidth : true});
-        console.log('appendSelect2');
     };
 </script>
 

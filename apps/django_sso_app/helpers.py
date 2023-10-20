@@ -73,10 +73,52 @@ def update_user(user_to_update,user_data):
         return handle_update_users_errors(data)
     
     return False
-        
+
+def update_userdata(userdata,user_id):
+    api_url = settings.FUSIONAUTH_HOST + f'/api/user/{user_id}'
+    data_user = {
+        "user": {
+            "data": userdata
+        }
+    }
+
+    headers = { 'Content-Type': 'application/json', 'Authorization': settings.FUSIONAUTH_USER_API_KEY }
+    response = requests.patch(url=api_url,json=data_user,headers=headers)
+
+    if response.status_code == 200:
+        return response.json()
+    
+def update_user_by_id(data,user_id):
+    api_url = settings.FUSIONAUTH_HOST + f'/api/user/{user_id}'
+    data_user = {
+        "user": data
+    }
+
+    headers = { 'Content-Type': 'application/json', 'Authorization': settings.FUSIONAUTH_USER_API_KEY }
+    response = requests.patch(url=api_url,json=data_user,headers=headers)
+
+    if response.status_code == 200:
+        return response.json()
+
+    if response.status_code != 200:
+        return response.json()
 
 def search_user(user_email):
     api_url = settings.FUSIONAUTH_HOST + f'/api/user?email={user_email}'
+
+    headers = { 'Content-Type': 'application/json', 'Authorization': settings.FUSIONAUTH_USER_API_KEY }
+    response = requests.get(url=api_url,headers=headers)
+
+    if response.status_code == 200:
+        data = response.json()
+        return data
+
+    if response.status_code != 200:
+        data = response.json()
+        return False
+
+def get_user(user_id):
+    api_url = settings.FUSIONAUTH_HOST + f'/api/user/{user_id}'
 
     headers = { 'Content-Type': 'application/json', 'Authorization': settings.FUSIONAUTH_USER_API_KEY }
     response = requests.get(url=api_url,headers=headers)
@@ -104,9 +146,7 @@ def handle_import_users_errors(data_errors,new_user):
                                 'user_email': new_user['email'],
                                 'error': result_update
                             }
-                            
-    
-
+                             
 def handle_update_users_errors(data_errors):
     for erros_type in data_errors:
         if erros_type == 'fieldErrors':

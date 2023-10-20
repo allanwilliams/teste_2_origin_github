@@ -93,12 +93,21 @@ class UserImportTest(TestCase):
     def setUp(self):
         settings.USE_FUSIONAUTH = False
         csv = "\nUsuario de importacao;12345678910;XXXXX-X;1;user.importacao;email@email.com;1;True"
+        csv_duplicado = "\nUsuario de importacao;12345678910;XXXXX-X;1;user.importacao;email@email.com;1;True\nUsuario de importacao;12345678910;XXXXX-X;1;user.importacao;email@email.com;1;True"
         self.arquivo_csv = InMemoryUploadedFile(
             BytesIO(csv.encode('utf-8')),
             None,
             'arquivo.csv',
             'text/csv',
             len(csv),
+            None
+        )
+        self.arquivo_csv_duplicado = InMemoryUploadedFile(
+            BytesIO(csv_duplicado.encode('utf-8')),
+            None,
+            'arquivo.csv',
+            'text/csv',
+            len(csv_duplicado),
             None
         )
         self.client = Client()
@@ -119,10 +128,16 @@ class UserImportTest(TestCase):
         form = ImportarUsuariosForm(data={},files={'file':self.arquivo_csv})
         self.assertTrue(form.is_valid())
 
+    def test_import_user_duplicado_request(self):
+        user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'
+        response = self.client.post('/users/importar-usuarios', {'file': self.arquivo_csv_duplicado},HTTP_USER_AGENT=user_agent)
+        self.assertEqual(response.status_code, 200,response)
+
     def test_import_user_request(self):
         user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'
         response = self.client.post('/users/importar-usuarios', {'file': self.arquivo_csv},HTTP_USER_AGENT=user_agent)
         self.assertEqual(response.status_code, 200,response)
+    
 
 class PapeisModelTest(TestCase):
     def setUp(self):
