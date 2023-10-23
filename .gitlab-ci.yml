@@ -34,7 +34,9 @@ SonarQubeCheck:
   script: 
     - sonar-scanner
         -Dsonar.projectKey=template-django-admin
-        -dsonar.python.coverage.reportPaths=coverage.xml
+        -Dsonar.python.coverage.reportPaths=coverage.xml
+        -Dsonar.login=$SONARQUBE_TOKEN
+        -Dsonar.branch.name=$CI_COMMIT_REF_NAME
   allow_failure: true
   only:
     - master
