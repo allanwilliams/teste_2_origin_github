@@ -31,6 +31,7 @@ SonarQubeCheck:
     key: "${CI_JOB_NAME}"
     paths:
       - .sonar/cache
+        -Dsonar.projectKey=template-django-admin
   script: 
     - sonar-scanner
   allow_failure: true
