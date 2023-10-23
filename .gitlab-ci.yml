@@ -35,4 +35,4 @@ SonarQubeCheck:
     - sonar-scanner
   allow_failure: true
   only:
-    - main
+    - master
