@@ -24,7 +24,7 @@ SonarScanner:
     - UnitTest
   script:
     - sonar-scanner
-      -Dsonar.host.url=http://sonar.defensoria.ce.def.br/
+      -Dsonar.host.url=http://192.168.0.78:9000
       -Dsonar.projectKey=template-django-admin
       -Dsonar.sources=apps
       -Dsonar.token=sqp_b683f3d1bef47464faa5f55f6b5d2b598492e478
