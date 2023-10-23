@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <!-- Font Awesome -->
     <!--<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.5.0/css/font-awesome.min.css">-->
-    <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Ionicons -->
     <link rel="stylesheet" href={% static "admin/ionicons/ionicons.min.css" %}>
 
@@ -82,122 +82,129 @@
         </a>
         <!-- Header Navbar: style can be found in header.less -->
         <nav class="navbar navbar-static-top">
-            <!-- Sidebar toggle button-->
-            <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
-                <span class="sr-only">Toggle navigation</span>
-            </a>
+            <div class='flex-space-between'>
+                <div>
+                    <!-- Sidebar toggle button-->
+                    <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+                        <span class="sr-only">Toggle navigation</span>
+                    </a>
 
-            <div class="navbar-custom-menu" style="float: left;">
-                <ul class="nav navbar-nav top-menu">
-                    {% get_menu request 'top' as app_list %}
-                    {% if app_list %}
-                    {% for app in app_list %}
-                    <li class="dropdown user user-menu">
-                        <a href="{{ app.admin_url }}">
-                            <i class="fa {% if app.icon %} {{app.icon}} {% else %}fa-database{% endif %}"></i>
-                            {{ app.name }}</a>
-                    </li>
-                    {% endfor %}
-                    {% endif %}
-                </ul>
-            </div>
+                    <div class="navbar-custom-menu" style="float: left;">
+                        <ul class="nav navbar-nav top-menu">
+                            {% get_menu request 'top' as app_list %}
+                            {% if app_list %}
+                            {% for app in app_list %}
+                            <li class="dropdown user user-menu">
+                                <a href="{{ app.admin_url }}">
+                                    <i class="fa {% if app.icon %} {{app.icon}} {% else %}fa-database{% endif %}"></i>
+                                    {{ app.name }}</a>
+                            </li>
+                            {% endfor %}
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div style='margin-left: 4em; display: flex;flex-direction: column;align-items: center; justify-content: center; height: 100%'>
+                        <i id='logoutTimer' class="fa-solid fa-stopwatch"> 60:00</i>
+                    </div>
+                </div>
 
-            <div class="navbar-custom-menu">
-                <ul class="nav navbar-nav">
-                    <!-- User Account: style can be found in dropdown.less -->
-                    <li class="dropdown user user-menu">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            {% get_adminlte_option 'show_avatar' as adminlte_show_avatar  %}
-                            {% if adminlte_show_avatar.valid and adminlte_show_avatar.show_avatar == 'on' %}
-                            {% get_adminlte_option 'avatar_field' request as adminlte_avatar_field  %}
-                            {% if adminlte_avatar_field.valid and adminlte_avatar_field.avatar_field %}
-                            <img src="{{ adminlte_avatar_field.avatar_field }}" class="user-image" alt="User Image" style="width: 25px; height:25px;">
-                            {% else %}
-                            <img src={% static "admin/dist/img/default.jpg" %} class="user-image" alt="User Image">
-                            {% endif %}
-                            {% endif %}
-                            <span class="hidden-xs">{{ request.user.first_name|default:'-' }} {{ request.user.last_name|default:'' }}</span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <!-- User image -->
-                            {% get_adminlte_option 'show_avatar' as adminlte_show_avatar  %}
-                            {% if adminlte_show_avatar.valid and adminlte_show_avatar.show_avatar == 'on' %}
-                            <li class="user-header">
+                <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav">
+                        <!-- User Account: style can be found in dropdown.less -->
+                        <li class="dropdown user user-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                {% get_adminlte_option 'show_avatar' as adminlte_show_avatar  %}
+                                {% if adminlte_show_avatar.valid and adminlte_show_avatar.show_avatar == 'on' %}
                                 {% get_adminlte_option 'avatar_field' request as adminlte_avatar_field  %}
                                 {% if adminlte_avatar_field.valid and adminlte_avatar_field.avatar_field %}
-                                <img src="{{ adminlte_avatar_field.avatar_field }}" class="img-circle" alt="User Image" style="width: 90px; height:90px;">
+                                <img src="{{ adminlte_avatar_field.avatar_field }}" class="user-image" alt="User Image" style="width: 25px; height:25px;">
                                 {% else %}
-                                <img src={% static "admin/dist/img/default.jpg" %} class="img-circle" alt="User Image">
+                                <img src={% static "admin/dist/img/default.jpg" %} class="user-image" alt="User Image">
                                 {% endif %}
-                                <p>
-                                    {{ request.user.first_name|default:'-' }} {{ request.user.last_name|default:'' }} -
-                                    {% if request.user.is_superuser %}
-                                    {% trans "Super manager" %}
+                                {% endif %}
+                                <span class="hidden-xs">{{ request.user.first_name|default:'-' }} {{ request.user.last_name|default:'' }}</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <!-- User image -->
+                                {% get_adminlte_option 'show_avatar' as adminlte_show_avatar  %}
+                                {% if adminlte_show_avatar.valid and adminlte_show_avatar.show_avatar == 'on' %}
+                                <li class="user-header">
+                                    {% get_adminlte_option 'avatar_field' request as adminlte_avatar_field  %}
+                                    {% if adminlte_avatar_field.valid and adminlte_avatar_field.avatar_field %}
+                                    <img src="{{ adminlte_avatar_field.avatar_field }}" class="img-circle" alt="User Image" style="width: 90px; height:90px;">
                                     {% else %}
-                                    {% if request.user.groups.all %}
-                                    {% for i in request.user.groups.all %}{{ i.name }}{% endfor %}
-                                    {% else %}
-                                    {% trans 'Normal' %}
+                                    <img src={% static "admin/dist/img/default.jpg" %} class="img-circle" alt="User Image">
                                     {% endif %}
-                                    {% endif %}
-                                    <small>{% trans "Register time" %}： {{ request.user.date_joined }}</small>
-                                </p>
-                            </li>
-                            {% else %}
-                            <li class="user-header" style="height: auto;">
-                                <p>
-                                    {{ request.user.first_name|default:'-' }} {{ request.user.last_name|default:'' }} -
-                                    {% if request.user.is_superuser %}
-                                    {% trans "Super manager" %}
-                                    {% else %}
-                                    {% if request.user.groups.all %}
-                                    {% for i in request.user.groups.all %}{{ i.name }}{% endfor %}
-                                    {% else %}
-                                    {% trans 'Normal' %}
-                                    {% endif %}
-                                    {% endif %}
-                                    <small>{% trans "Register time" %}： {{ request.user.date_joined }}</small>
-                                </p>
-                            </li>
-                            {% endif %}
+                                    <p>
+                                        {{ request.user.first_name|default:'-' }} {{ request.user.last_name|default:'' }} -
+                                        {% if request.user.is_superuser %}
+                                        {% trans "Super manager" %}
+                                        {% else %}
+                                        {% if request.user.groups.all %}
+                                        {% for i in request.user.groups.all %}{{ i.name }}{% endfor %}
+                                        {% else %}
+                                        {% trans 'Normal' %}
+                                        {% endif %}
+                                        {% endif %}
+                                        <small>{% trans "Register time" %}： {{ request.user.date_joined }}</small>
+                                    </p>
+                                </li>
+                                {% else %}
+                                <li class="user-header" style="height: auto;">
+                                    <p>
+                                        {{ request.user.first_name|default:'-' }} {{ request.user.last_name|default:'' }} -
+                                        {% if request.user.is_superuser %}
+                                        {% trans "Super manager" %}
+                                        {% else %}
+                                        {% if request.user.groups.all %}
+                                        {% for i in request.user.groups.all %}{{ i.name }}{% endfor %}
+                                        {% else %}
+                                        {% trans 'Normal' %}
+                                        {% endif %}
+                                        {% endif %}
+                                        <small>{% trans "Register time" %}： {{ request.user.date_joined }}</small>
+                                    </p>
+                                </li>
+                                {% endif %}
 
-                            <!-- Menu Body -->
-                            <!--<li class="user-body">-->
-                            <!--<div class="row">-->
-                            <!--<div class="col-xs-4 text-center">-->
-                            <!--<a href="#">Followers</a>-->
-                            <!--</div>-->
-                            <!--<div class="col-xs-4 text-center">-->
-                            <!--<a href="#">Sales</a>-->
-                            <!--</div>-->
-                            <!--<div class="col-xs-4 text-center">-->
-                            <!--<a href="#">Friends</a>-->
-                            <!--</div>-->
-                            <!--</div>-->
-                            <!--&lt;!&ndash; /.row &ndash;&gt;-->
-                            <!--</li>-->
-                            <!-- Menu Footer-->
-                            <li class="user-footer">
-                                <div class="pull-left">
-                                    {% if use_fusionauth %}
-                                        <a  href="/django_sso_app/sso-change-password" class="btn btn-default btn-flat">{% trans 'Change password' %}</a>
-                                    {% else %}
-                                        <a  href="/admin/password_change/" class="btn btn-default btn-flat">{% trans 'Change password' %}</a>
-                                    {% endif %}
-                                </div>
-                                <div class="pull-right">
-                                    <a href="{% url 'admin:logout' %}" class="btn btn-default btn-flat">{% trans 'Log out' %}</a>
-                                </div>
-                            </li>
-                        </ul>
-                    </li>
-                    <!-- Control Sidebar Toggle Button -->
-                    <li>
-                        {% if adminlte.demo %}
-                        <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
-                        {% endif %}
-                    </li>
-                </ul>
+                                <!-- Menu Body -->
+                                <!--<li class="user-body">-->
+                                <!--<div class="row">-->
+                                <!--<div class="col-xs-4 text-center">-->
+                                <!--<a href="#">Followers</a>-->
+                                <!--</div>-->
+                                <!--<div class="col-xs-4 text-center">-->
+                                <!--<a href="#">Sales</a>-->
+                                <!--</div>-->
+                                <!--<div class="col-xs-4 text-center">-->
+                                <!--<a href="#">Friends</a>-->
+                                <!--</div>-->
+                                <!--</div>-->
+                                <!--&lt;!&ndash; /.row &ndash;&gt;-->
+                                <!--</li>-->
+                                <!-- Menu Footer-->
+                                <li class="user-footer">
+                                    <div class="pull-left">
+                                        {% if use_fusionauth %}
+                                            <a  href="/django_sso_app/sso-change-password" class="btn btn-default btn-flat">{% trans 'Change password' %}</a>
+                                        {% else %}
+                                            <a  href="/admin/password_change/" class="btn btn-default btn-flat">{% trans 'Change password' %}</a>
+                                        {% endif %}
+                                    </div>
+                                    <div class="pull-right">
+                                        <a href="{% url 'admin:logout' %}" class="btn btn-default btn-flat">{% trans 'Log out' %}</a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- Control Sidebar Toggle Button -->
+                        <li>
+                            {% if adminlte.demo %}
+                            <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
             </div>
         </nav>
     </header>
@@ -706,6 +713,7 @@ $(function() {
         },
     });
 </script>
+<script src="{% static 'admin/js/custom-navbar.js' %}?v=1.0"></script>
 
 {% block extrajs %}{% endblock %}
 {% block extra_js %}{% endblock extra_js %}
