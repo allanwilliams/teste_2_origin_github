@@ -37,6 +37,8 @@ SonarQubeCheck:
         -Dsonar.qualitygate.wait=true
         -Dsonar.python.coverage.reportPaths=coverage.xml
         -Dsonar.login=$SONARQUBE_TOKEN
+        -Dsonar.exclusions=apps/session/*,apps/core/*,apps/core/api/*,apps/django_sso_app/*
+        -Dsonar.sources=apps
   allow_failure: true
   only:
     - master
