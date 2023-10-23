@@ -134,13 +134,14 @@ def processar_linha_csv(row):
         if cpf_clear:
             user_data['cpf'] = cpf_clear
 
-
         user = User(**user_data)
 
         user.set_password(password)
         user.save()
         group = Group.objects.get(pk=grupo)
         user.groups.add(group)
+        if grupo:
+            user_data['grupo_id'] = grupo
 
         return {
             'user_data': user_data,

@@ -1,5 +1,6 @@
 from django.conf import settings
 from apps.users.models import Papeis
+from django.contrib.auth.models import Group
 import requests
 
 def import_user(users):
@@ -10,7 +11,13 @@ def import_user(users):
         if papel_id:
             papel = Papeis.objects.filter(id=papel_id).first()
             if papel:
-                roles = ['FLAG[IS_STAFF]',f'PAPEL[{papel.titulo}]']
+                roles.append(f'PAPEL[{papel.titulo}]')
+
+        grupo_id = user.get('grupo_id')
+        if grupo_id:
+            grupo = Group.objects.filter(id=grupo_id).first()
+            if grupo:
+                roles.append(f'GRUPO[{grupo.name}]')
                 
         new_user = {
             'active': True,
