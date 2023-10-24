@@ -5,6 +5,9 @@ stages:
 UnitTest:
   image: python:3.8.10
   stage: test
+  cache:
+    paths:
+      - coverage_reports
   before_script:
     - pip install -r requirements.txt
   script:
