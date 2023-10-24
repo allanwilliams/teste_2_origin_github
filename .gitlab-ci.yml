@@ -7,7 +7,7 @@ UnitTest:
   stage: test
   cache:
     paths:
-      - coverage_reports
+      - .sonar/cache
   before_script:
     - pip install -r requirements.txt
   script:
@@ -19,8 +19,7 @@ UnitTest:
       fi
     - coverage report -m
     - coverage xml -i
-    - mkdir -p coverage_reports
-    - mv coverage.xml coverage_reports/
+    - mv coverage.xml .sonar/cache/
 
 SonarQubeCheck:
   image: 
@@ -40,7 +39,7 @@ SonarQubeCheck:
     - sonar-scanner
         -Dsonar.projectKey=dev-dpge_template-django-admin_AYtdpS9X7Q6IbM8YFewV
         -Dsonar.qualitygate.wait=true
-        -Dsonar.python.coverage.reportPaths=coverage_reports/coverage.xml
+        -Dsonar.python.coverage.reportPaths=.sonar/cache/coverage.xml
         -Dsonar.login=$SONARQUBE_TOKEN
         -Dsonar.exclusions=apps/session/*,apps/core/*,apps/core/api/*,apps/django_sso_app/*
         -Dsonar.sources=apps
