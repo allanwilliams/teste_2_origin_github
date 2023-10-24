@@ -134,7 +134,6 @@ def get_user(user_id):
         return data
 
     if response.status_code != 200:
-        data = response.json()
         return False
     
 def handle_import_users_errors(data_errors,new_user):
