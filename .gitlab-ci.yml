@@ -1,6 +1,6 @@
 variables:
   CI_CLEAN_WORKING_DIRECTORY: "false"
-  
+
 stages:
   - test
   - sonarqube
@@ -21,6 +21,9 @@ UnitTest:
     - coverage xml -i
     - mkdir -p artifacts
     - mv coverage.xml artifacts/
+  artifacts:
+    paths:
+      - artifacts/
 
 SonarQubeCheck:
   image: 
