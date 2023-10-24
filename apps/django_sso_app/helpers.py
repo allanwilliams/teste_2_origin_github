@@ -121,7 +121,6 @@ def search_user(user_email):
         return data
 
     if response.status_code != 200:
-        data = response.json()
         return False
 
 def get_user(user_id):
