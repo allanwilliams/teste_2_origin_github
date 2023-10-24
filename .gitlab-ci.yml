@@ -22,8 +22,9 @@ UnitTest:
     - mkdir -p artifacts
     - mv coverage.xml artifacts/
   artifacts:
+    expire_in: 1 hour
     paths:
-      - artifacts/
+      - $CI_PROJECT_DIR/coverage.xml
 
 SonarQubeCheck:
   image: 
@@ -34,6 +35,7 @@ SonarQubeCheck:
     - UnitTest
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    CI_CLEAN_WORKING_DIRECTORY: "false"
   cache:
     key: "${CI_JOB_NAME}"
     paths:
@@ -49,6 +51,3 @@ SonarQubeCheck:
   allow_failure: true
   only:
     - master
-  artifacts:
-    paths:
-      - artifacts/
