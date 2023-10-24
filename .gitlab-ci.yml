@@ -16,8 +16,6 @@ UnitTest:
       fi
     - coverage report -m
     - coverage xml -i
-    - pwd
-    - ls
 
 SonarQubeCheck:
   image: 
@@ -33,6 +31,8 @@ SonarQubeCheck:
     paths:
       - .sonar/cache
   script: 
+    - pwd
+    - ls
     - sonar-scanner
         -Dsonar.projectKey=dev-dpge_template-django-admin_AYtdpS9X7Q6IbM8YFewV
         -Dsonar.qualitygate.wait=true
