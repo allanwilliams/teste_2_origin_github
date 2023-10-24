@@ -1,3 +1,6 @@
+variables:
+  CI_CLEAN_WORKING_DIRECTORY: "false"
+  
 stages:
   - test
   - sonarqube
