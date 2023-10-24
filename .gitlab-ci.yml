@@ -19,8 +19,6 @@ UnitTest:
       fi
     - coverage report -m
     - coverage xml -i
-    - mkdir -p artifacts
-    - mv coverage.xml artifacts/
   artifacts:
     expire_in: 1 hour
     paths:
@@ -44,7 +42,7 @@ SonarQubeCheck:
     - sonar-scanner
         -Dsonar.projectKey=dev-dpge_template-django-admin_AYtdpS9X7Q6IbM8YFewV
         -Dsonar.qualitygate.wait=true
-        -Dsonar.python.coverage.reportPaths=artifacts/coverage.xml
+        -Dsonar.python.coverage.reportPaths=coverage.xml
         -Dsonar.login=$SONARQUBE_TOKEN
         -Dsonar.exclusions=apps/session/*,apps/core/*,apps/core/api/*,apps/django_sso_app/*
         -Dsonar.sources=apps
