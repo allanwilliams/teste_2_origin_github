@@ -16,6 +16,8 @@ UnitTest:
       fi
     - coverage report -m
     - coverage xml -i
+    - mkdir -p artifacts
+    - mv coverage.xml artifacts/
 
 SonarQubeCheck:
   image: 
@@ -31,15 +33,13 @@ SonarQubeCheck:
     paths:
       - .sonar/cache
   script: 
-    - pwd
-    - ls
     - sonar-scanner
         -Dsonar.projectKey=dev-dpge_template-django-admin_AYtdpS9X7Q6IbM8YFewV
         -Dsonar.qualitygate.wait=true
-        -Dsonar.python.coverage.reportPaths=/builds/dev-dpge/template-django-admin/coverage.xml
+        -Dsonar.python.coverage.reportPaths=artifacts/coverage.xml
         -Dsonar.login=$SONARQUBE_TOKEN
         -Dsonar.exclusions=apps/session/*,apps/core/*,apps/core/api/*,apps/django_sso_app/*
-        -Dsonar.sources=/builds/dev-dpge/template-django-admin/apps
+        -Dsonar.sources=apps
   allow_failure: true
   only:
     - master
