@@ -7,8 +7,7 @@ UnitTest:
   stage: test
   before_script:
     - pip install -r requirements.txt
-    - apt-get update
-    - apt-get install -y libjpeg8
+    - apt-get install -y libjpeg-dev
     - chmod +x bin/wkhtmltopdf
     - export PATH=$PATH:$PWD/bin
     - wkhtmltopdf --version
