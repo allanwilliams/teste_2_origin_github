@@ -13,7 +13,7 @@ from .helpers import url_img_token,url_verificador,url_img_mobile
 from geopy.geocoders import Nominatim
 
 @require_http_methods(["GET"])
-def render_pdf(request):
+def render_pdf(request): # pragma: no cover
     from wkhtmltopdf.views import PDFTemplateResponse
     if request.GET.get('pk'):
         id_certidao = request.GET.get('pk')

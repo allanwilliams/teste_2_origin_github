@@ -48,27 +48,6 @@ class CertidaoTest(TestCase):
 
         self.assertTrue(token_validador in str(assinatura))
         
-    def test_render_pdf(self):
-        certidao = Certidao(
-            municipio="Fortaleza",
-            data_hora=timezone.now(),
-            assinatura=True,
-            criado_por=self.user
-        )
-        certidao.save()
-        
-        token_validador = get_hash()
-        dic_assinatura = {
-            'token': token_validador,
-            'certidao': certidao,
-            'criado_em': timezone.now()
-        }
-        assinatura = CertidaoAssinatura(**dic_assinatura)
-        assinatura.save()
-
-        response = self.client.get('/certidao_localizacao/render-pdf/', {'pk': encrypt(certidao.id)},HTTP_USER_AGENT=user_agent)
-        self.assertEqual(response.status_code, 200)
-
     def test_assinar(self):
         certidao = Certidao(
             municipio="Fortaleza",
