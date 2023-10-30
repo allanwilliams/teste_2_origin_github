@@ -2,21 +2,11 @@ stages:
   - test
   - sonarqube
 
-variables:
-  # Defina a URL do pacote .deb do wkhtmltopdf que você deseja usar
-  WKHTMLTOPDF_URL: "https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb"
-
 UnitTest:
   image: python:3.8.10
   stage: test
   before_script:
-    #- pip install -r requirements.txt
-    - apt-get update
-    - apt-get install -y curl
-    - curl -LO $WKHTMLTOPDF_URL
-    - dpkg -i wkhtmltox_0.12.6-1.bionic_amd64.deb
-    - apt-get install -f -y
-    - wkhtmltopdf --version
+    - pip install -r requirements.txt
   script:
     - coverage run --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" manage.py test apps --settings config.cicd_settings
     - COVERAGE_PERCENTAGE=$(coverage report --skip-covered | awk '/TOTAL/ {print $NF}' | tr -d '%')
