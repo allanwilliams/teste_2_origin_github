@@ -6,24 +6,16 @@ variables:
   # Defina a URL do pacote .deb do wkhtmltopdf que você deseja usar
   WKHTMLTOPDF_URL: "https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb"
 
-InstallWkhtmltopdf:
-  stage: test
-  script:
-    - apt-get update
-    - apt-get install -y curl
-    - curl -LO $WKHTMLTOPDF_URL
-    - dpkg -i wkhtmltox_0.12.6-1.bionic_amd64.deb
-    - apt-get install -f -y
-  
 UnitTest:
   image: python:3.8.10
   stage: test
   before_script:
     #- pip install -r requirements.txt
     - apt-get update
-    - apt-get install -y libjpeg-turbo8
-    - wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb
-    - apt-get install -f ./wkhtmltox_0.12.6-1.focal_amd64.deb
+    - apt-get install -y curl
+    - curl -LO $WKHTMLTOPDF_URL
+    - dpkg -i wkhtmltox_0.12.6-1.bionic_amd64.deb
+    - apt-get install -f -y
     - wkhtmltopdf --version
   script:
     - coverage run --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" manage.py test apps --settings config.cicd_settings
