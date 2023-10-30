@@ -6,11 +6,13 @@ from django.dispatch.dispatcher import receiver
 from django.db.models.signals import post_save, pre_save
 from django.conf import settings
 from django_currentuser.middleware import get_current_authenticated_user
-from apps.users.choices import  CHOICES_SEXO_USER
-from apps.core.mixins import BaseModel
 from django.utils import timezone
 from django.core import serializers
+from apps.users.choices import  CHOICES_SEXO_USER
+from apps.core.mixins import BaseModel
+from apps.core.utils import core_encrypt,core_decrypt
 import json
+import requests
 
 class User(AbstractUser):
     PAPEL_DEFENSOR = 1
@@ -49,7 +51,7 @@ class User(AbstractUser):
                                  null=True,
                                  max_length=255)
 
-    cpf = models.CharField('CPF', max_length=14, unique=True, null=True, blank=True)
+    cpf = models.CharField('CPF', max_length=500, unique=True, null=True, blank=True)
 
    
     sexo = models.IntegerField(_("Sexo"), choices=CHOICES_SEXO_USER,
@@ -58,8 +60,9 @@ class User(AbstractUser):
                                 blank=True, null=True, max_length=200)
     
     fusionauth_user_id = models.CharField('FusionAuth user ID',max_length=50,blank=True, null=True)
-  
-		    
+
+    crypted_fields = ['cpf',]
+    
     def save(self,
              force_insert=False,
              force_update=False,
@@ -78,6 +81,10 @@ class User(AbstractUser):
         if self.id and self.first_name:
             self.user_str = '{:08n} {} {} ({})'.format(self.id, self.first_name, self.last_name,self.username)
         
+        for crypted_field in self.crypted_fields:
+            new_value = core_encrypt(core_decrypt(getattr(self, crypted_field)))
+            setattr(self, crypted_field, new_value)
+
         super(User, self).save(
             force_insert=False,
             force_update=False,
@@ -87,7 +94,17 @@ class User(AbstractUser):
         if settings.USE_FUSIONAUTH and self.fusionauth_user_id: # pragma: no cover
             self.save_userdata()
             self.save_userfusionauth()
-            
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        for crypted_field in cls.crypted_fields:
+            index = field_names.index(crypted_field)
+            new_value = core_decrypt(values[index])
+            new_values = list(values)
+            new_values[index] = new_value
+            values = tuple(new_values)
+        return super().from_db(db, field_names, values)
+        
     def save_userdata(self): # pragma: no cover
         my_json = json.loads(self.model_to_json())[0]['fields']
         for field in list(my_json):
@@ -105,6 +122,23 @@ class User(AbstractUser):
             "lastName": self.last_name
         }
         update_user_by_id(data,self.fusionauth_user_id)
+
+    def test_fusionauth_password(self,password): # pragma: no cover
+        api_url = settings.FUSIONAUTH_HOST + '/api/login'
+        data_user = {
+            'loginId': self.email,
+            'password': password
+        }
+
+        headers = { 'Content-Type': 'application/json', 'Authorization': settings.FUSIONAUTH_USER_API_KEY }
+        response = requests.post(url=api_url,json=data_user,headers=headers)
+
+        if response.status_code == 200:
+            user_data = response.json()
+            if user_data['token']:
+                return True
+        return False
+
 
     def model_to_json(self): # pragma: no cover
         return serializers.serialize('json', [self])
@@ -148,7 +182,7 @@ def create_app_user_str(sender, instance, created, **kwargs):
 class Papeis(BaseModel):
     titulo = models.CharField(
         'Título',
-        max_length=25,
+        max_length=500,
     )
 
     def __str__(self):

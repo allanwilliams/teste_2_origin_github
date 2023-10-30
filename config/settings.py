@@ -15,6 +15,7 @@ import os, sys
 from django.contrib.messages import constants as messages
 from datetime import timedelta
 import environ
+import platform
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,7 +39,7 @@ SECRET_KEY = 'django-insecure-tn0y5u-zdy_=u=7+mp&r@46-rl=bdro+6tmcqupd_nwpa&k6^c
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", False)
 
-ALLOWED_HOSTS =  env("ALLOWED_HOSTS", default=['localhost'])
+ALLOWED_HOSTS =  env("ALLOWED_HOSTS", default=['0.0.0.0','localhost','localhost:8000','127.0.0.1','127.0.0.1:8000','127.0.0.1:8001'])
 
 # Application definition
 
@@ -67,7 +68,9 @@ LOCAL_APPS = [
     'apps.core',
     'apps.users',
     'apps.session',
-    'apps.django_sso_app'
+    'apps.django_sso_app',
+    'apps.contrib',
+    'apps.certidao_localizacao',
 ]
 
 INSTALLED_APPS = THIRD_PARTY_APPS + DJANGO_APPS + LOCAL_APPS
@@ -79,8 +82,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',    
     "django_currentuser.middleware.ThreadLocalUserMiddleware",
     "apps.session.middleware.SessionMiddleware",
 ]
@@ -248,17 +250,39 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Configurações de CORS
-CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS", default=[
+CORS_ALLOWED_ORIGINS = env("DJANGO_CORS_ALLOWED_ORIGINS", default=[
+    'http://0.0.0.0:8000',
     'http://127.0.0.1:8000',
     'http://localhost:8000',
-    'http://localhost:5173',
-    "http://127.0.0.1:5173"])
+    "https://stage-app.defensoria.ce.def.br",
+    "http://192.168.0.121:8000",
+    "http://localhost:19006","http://127.0.0.1:3000"])
+
+
+CORS_ORIGIN_WHITELIST = env("DJANGO_CORS_ORIGIN_WHITELIST", default=[
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+    "https://stage-app.defensoria.ce.def.br",
+    "http://192.168.0.121:8000",
+    "http://localhost:19006","http://127.0.0.1:3000"])
 
 
 ADMINLTE_SETTINGS = {
     'search_form': False,
     'demo': False,
     'skin': 'green'
+}
+
+ENCRYPT_KEY = b'z-eIxGbdQ3QlLoB9stT9QhluFpxXsNoYsgpHN_fGXAg='
+
+if platform == "linux" or platform == "linux2":
+    WKHTMLTOPDF_CMD = env("WKHTMLTOPDF_CMD", default='wkhtmltopdf')
+elif platform == "win32":
+    WKHTMLTOPDF_CMD = 'C:/"Program Files"/wkhtmltopdf/bin/wkhtmltopdf.exe'
+
+
+WKHTMLTOPDF_CMD_OPTIONS = {
+    'quiet': True,
 }
 
 # DJANGO SIMPLE SSO CONFIGS

@@ -2,6 +2,7 @@ from mozilla_django_oidc.auth import OIDCAuthenticationBackend
 from django.contrib.auth.models import Group
 from apps.users.models import Papeis
 from apps.django_sso_app.helpers import get_user
+from apps.core.utils import core_decrypt
 import re
 
 class MyAuthenticationBackend(OIDCAuthenticationBackend):
@@ -77,7 +78,8 @@ class MyAuthenticationBackend(OIDCAuthenticationBackend):
             if userdata:
                 for data in userdata:
                     if hasattr(user,data):
-                        setattr(user,data,userdata[data])
+                        dado = core_decrypt(userdata[data])
+                        setattr(user,data,dado)
                 user.save()
 
     def create_user(self, claims):

@@ -1,0 +1,67 @@
+{% extends "certidao_change_form.html" %}
+
+{% block after_buttons %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+   <head>
+      <title>Certidão</title>
+      <meta charset="UTF-8">
+      <link rel="stylesheet" href={% static "css/certidao_localizacao/base_certidao.css" %}>
+  </head>
+  <body>
+      <input id='certidao_id' type='hidden' value={{certidao_id}} />
+      <div class="documento-cabecalho">
+         <img alt="" src="{% static 'imagens/logo-vertical.png' %}" >
+         <hr>
+      </div>
+      <div class="documento">
+         <div class="documento-conteudo">
+            {% autoescape off %}
+               <p style="margin: 5rem 27rem">
+                  Por gentileza, escaneie o <strong>QR-Code</strong> abaixo através do seu celular, utilizando uma <strong>rede móvel (3G/4G/5G/ <span class="red">não utilizar o WiFi</span>)</strong> para realizar a emissão do certificado.
+               </p>
+               <hr>
+               <div class='passos'>
+                  <div>
+                     <p>1. Habilite o GPS do Smartphone</p>
+                     <img alt="" src="{% static 'imagens/habilitar_gps.png' %}"> 
+                  </div>
+                  <div>
+                     <p>2. Escaneie o QR-Code abaixo  <i class="fa-solid fa-hand-point-down"></i></p>
+                     <img alt="" height="304" src="{{ url_img_token|safe }}">
+                  </div>
+                  <div>
+                     <p>3. Permita o acesso ao dispositivo</p>
+                     <img alt="" src="{% static 'imagens/permitir_localizacao.jpeg' %}"> 
+                  </div>
+                  <div>
+                     <p>4. Digite a senha do "Nossa Defensoria"</p>
+                     <img alt="" src="{% static 'imagens/assinar_documento.jpeg' %}"> 
+                  </div>
+               </div>
+            {% endautoescape %}
+         </div>
+         
+      </div>
+      <div class="token">
+      </div>
+      <script>
+         setInterval(validarAssinatura,10000)
+         function validarAssinatura(){
+            const certidao_id = $('#certidao_id').val()
+
+            $.ajax({
+               url: `/core/api/general/certidao_localizacao/Certidao/${certidao_id}`,
+               success: (data) =>{
+                  const result = data.results[0]
+                  if(result.assinatura){
+                     location.href = `/admin/certidao_localizacao/certidao/${certidao_id}`
+                  }
+               }
+            })
+         }
+      </script>
+   </body>
+</html>
+{% endblock %}

@@ -13,6 +13,8 @@ from django_currentuser.middleware import get_current_user
 from reversion.admin import VersionAdmin
 from reversion.revisions import is_active, set_comment
 from django.contrib.admin.options import ModelAdmin as MA
+from apps.core.encrypt_url_utils import encrypt
+from apps.core.utils import core_decrypt, core_encrypt,format
 
 LIST_PER_PAGE = 10
 
@@ -32,6 +34,9 @@ class BaseModel(models.Model):
                                        blank=True,
                                        null=True)
 
+    crypted_fields = []
+    masked_fields = []
+
     class Meta:
         abstract = True
 
@@ -47,10 +52,28 @@ class BaseModel(models.Model):
             elif get_current_user() and get_current_user().id:
                 self.modificado_por = get_current_user()
                 self.modificado_em = timezone.now()
+        
+        for crypted_field in self.crypted_fields:
+            new_value = core_encrypt(getattr(self, crypted_field))
+            setattr(self, crypted_field, new_value)
+
         super(BaseModel, self).save(force_insert=False,
                                     force_update=False,
                                     using=None,
                                     update_fields=None)
+    
+    def get_encrypt_id(self):
+        return encrypt(self.id)
+    
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        for crypted_field in cls.crypted_fields:
+            index = field_names.index(crypted_field)
+            new_value = core_decrypt(values[index])
+            new_values = list(values)
+            new_values[index] = new_value
+            values = tuple(new_values)
+        return super().from_db(db, field_names, values)
 
 
 class BaseModelDRF(models.Model):
@@ -72,7 +95,17 @@ class BaseModelDRF(models.Model):
 
 
 class AuditoriaAdmin(VersionAdmin):
+    def changelist_view(self, request, extra_context=None):
+        response = super().changelist_view(request, extra_context=extra_context)
+        result_list = response.context_data['cl'].result_list
+        if self.model.masked_fields:
+            for obj in result_list:
+                for field in self.model.masked_fields:
+                    setattr(obj,field,eval(self.model.masked_fields[field]['function'])(getattr(obj,field),''))
+        
+        response.context_data['cl'].result_list = result_list
 
+        return response
 
     def log_change(self, request, object, message):
         entry = super().log_change(request, object, message)
