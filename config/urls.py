@@ -65,8 +65,8 @@ urlpatterns = [
     path('core/', include('apps.core.urls')),
     path('oidc/', include('mozilla_django_oidc.urls')),
     path("users/", include("apps.users.urls", namespace="users")),
-    path("certidao_localizacao/", include("apps.certidao_localizacao.urls", namespace="certidao_localizacao")),
     path('ajax_select/', include(ajax_select_urls)),
+    path("certidao_localizacao/", include("apps.certidao_localizacao.urls", namespace="certidao_localizacao")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(
     settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
