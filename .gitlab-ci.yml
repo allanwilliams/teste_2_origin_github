@@ -7,7 +7,7 @@ UnitTest:
   stage: test
   before_script:
     - pip install -r requirements.txt
-    - apt-get install -y libjpeg
+    - apt-get install -y libjpeg-turbo8
     - chmod +x bin/wkhtmltopdf
     - export PATH=$PATH:$PWD/bin
     - wkhtmltopdf --version
