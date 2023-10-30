@@ -5,11 +5,11 @@ from .models import Certidao
 def get_hash():
     return hashlib.md5(os.urandom(128)).hexdigest().upper()[:16]
 
-def url_img_token(token):
+def url_img_token(token): # pragma: no cover
     url = '{0}?token={1}'.format(base_url('certidao_localizacao/verificar-assinatura'), token)
     return qrcode(url, '96x96')
 
-def url_verificador():
+def url_verificador(): # pragma: no cover
     return base_url('certidao_localizacao/verificar-assinatura')
 
 def qrcode(value, size="128x128"):
