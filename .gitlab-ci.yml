@@ -8,7 +8,7 @@ UnitTest:
   before_script:
     - pip install -r requirements.txt
     - wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb
-    - sudo apt install -f ./wkhtmltox_0.12.6-1.focal_amd64.deb
+    - apt-get install -f ./wkhtmltox_0.12.6-1.focal_amd64.deb
     - wkhtmltopdf --version
   script:
     - coverage run --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" manage.py test apps --settings config.cicd_settings
