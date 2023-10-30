@@ -7,6 +7,8 @@ UnitTest:
   stage: test
   before_script:
     - pip install -r requirements.txt
+    - chmod +x bin/wkhtmltopdf
+    - export PATH=$PATH:$PWD/bin
   script:
     - coverage run --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" manage.py test apps --settings config.cicd_settings
     - COVERAGE_PERCENTAGE=$(coverage report --skip-covered | awk '/TOTAL/ {print $NF}' | tr -d '%')
