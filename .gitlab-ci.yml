@@ -6,11 +6,6 @@ variables:
   # Defina a URL do pacote .deb do wkhtmltopdf que você deseja usar
   WKHTMLTOPDF_URL: "https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb"
 
-# Configure o serviço wkhtmltopdf
-services:
-  - name: wkhtmltopdf:latest
-    alias: wkhtmltopdf
-
 InstallWkhtmltopdf:
   stage: test
   script:
