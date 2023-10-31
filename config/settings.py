@@ -57,6 +57,8 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     "adminlteui.apps.AdminlteUIConfig",
+    'constance',
+    'constance.backends.database',
     'mozilla_django_oidc',
     "corsheaders",
     'rest_framework',
@@ -97,6 +99,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'constance.context_processors.config',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -177,6 +180,14 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}
+
+DOMINIO_ATUAL = env('DOMINIO_ATUAL', default='localhost:8000')
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+CONSTANCE_CONFIG = {
+   'DOMINIO_ATUAL': (DOMINIO_ATUAL,
+                'Dominio atual do sistema',
+                str),
 }
 
 # Password validation

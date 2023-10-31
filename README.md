@@ -43,6 +43,16 @@ Caso deseje utilizar o FusionAuth os parametros abaixo deverão ser configurados
 [OIDC_RP_CLIENT_SECRET]: SECRET gerado para a aplicação no FusionAuth
 ```
 
+A classe User possui um recurso que possibilita compartilhar informações com o FusionAuth, onde campos da model podem ser gravados diretamente na base de dados do FusionAuth.
+
+Para configurar campos compartilhados basta adiciona-los na funcao userdata_list_fields
+ex:
+```
+    def userdata_list_fields(self):
+        return [
+            'cpf','campo1','campo2'
+        ]
+```
 ## Padrões de Roles FusionAuth
 Sempre que uma nova application for inicializada no FusionAuth as roles de controle deverão ser criadas
 ```
@@ -87,3 +97,18 @@ coverage run manage.py test apps/{nome_do_app}; coverage html --omit="*/venv/*,c
 ```
 
 Os resultados dos testes serão gravados na pasta tests/coverage/ e podem ser acessados abrindo o arquivo tests/coverage/index.html
+
+## Criptografia
+O template possui uma camada de criptografia centralizada aplicada a todas models que herdam de BaseModel. 
+
+Para habilitar campos basta incluir os fields na propriedade crypted_fields da model
+ex:
+
+```
+class Exemplo(BaseModel):
+    campo_exemplo = models.CharField(max_length=500,null=True,blank=True)
+
+    crypted_fields = ['campo_exemplo',]
+```
+
+obs: Os campos criptografados deverão ser do tipo ChatField e ter um max_length que permita gravar a hash gerada

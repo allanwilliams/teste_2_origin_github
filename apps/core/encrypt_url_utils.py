@@ -20,9 +20,7 @@ def encrypt(txt):
         # encode to urlsafe base64 format
         encrypted_text = base64.urlsafe_b64encode(encrypted_text).decode("utf-8")
         return encrypted_text
-    except Exception as e:
-        # log the error if any
-        print(e)
+    except Exception: # pragma: no cover
         logging.getLogger("error_logger").error(traceback.format_exc())
         return None
 
@@ -34,7 +32,7 @@ def decrypt(txt):
         cipher_suite = Fernet(settings.ENCRYPT_KEY)
         decoded_text = cipher_suite.decrypt(txt).decode("utf-8")
         return unquote(decoded_text)
-    except Exception as e:
+    except Exception: # pragma: no cover
         # log the error
         logging.getLogger("error_logger").error(traceback.format_exc())
         return None

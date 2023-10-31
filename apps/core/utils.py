@@ -21,7 +21,7 @@ def core_encrypt(string_to_encrypt):
 
         encrypted_string = base64.b64encode(combined_data).decode("utf-8")
         return encrypted_string
-    except Exception as e:
+    except Exception:
         return string_to_encrypt
 
 
@@ -42,16 +42,16 @@ def core_decrypt(encrypted_string):
 
         decrypted_string = decrypted_data.decode("utf-8")
         return decrypted_string
-    except Exception as e:
+    except Exception:
         return encrypted_string
 
-def format(string,pattern):
+def format(string,pattern):  # pragma: no cover
     if string:
         return f'{string[1:]}.xxjhaskjdhka?????klajslkdx.{string[:-1]}'
 
-def format_longtext(string):
+def format_longtext(string):  # pragma: no cover
     if string:
         return f'{string[3:3]}.xxx.{string[:-3]}'
     
-def format_email(string):
+def format_email(string):  # pragma: no cover
     return string

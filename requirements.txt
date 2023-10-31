@@ -58,3 +58,7 @@ django-webtest==1.9.11
 coverage==7.3.2
 geopy==2.3.0
 pycryptodomex==3.19.0
+django-constance
+django-utils-six==2.0
+redis==3.2.1
+django-picklefield==3.1

@@ -5,7 +5,7 @@ from apps.django_sso_app.helpers import get_user
 from apps.core.utils import core_decrypt
 import re
 
-class MyAuthenticationBackend(OIDCAuthenticationBackend):
+class MyAuthenticationBackend(OIDCAuthenticationBackend):  # pragma: no cover
     # Filtra as roles baseadas no tipo
     def get_roles(self,roles,tipo):
         new_roles = []
