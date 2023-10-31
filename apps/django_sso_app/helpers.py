@@ -135,7 +135,46 @@ def get_user(user_id):
 
     if response.status_code != 200:
         return False
-    
+
+def create_fusionauth_user(user,password):
+    if not search_user(user.email):
+        roles = ['FLAG[IS_STAFF]']
+        
+        new_user = {
+            'active': True,
+            'email': user.email,
+            'fullName': user.name,
+            'firstName': user.first_name,
+            'lastName': user.last_name,
+            'password': password,
+            'username': user.username,
+            'registrations': [
+                {
+                'applicationId': settings.OIDC_RP_CLIENT_ID,
+                'roles': roles,
+                'verified': True
+                }
+            ],
+            'verified': True,
+        }
+        api_url = settings.FUSIONAUTH_HOST + '/api/user'
+        data_user = {
+            'user': new_user,
+            'validateDbConstraints': True
+        }
+
+        headers = { 'Content-Type': 'application/json', 'Authorization': settings.FUSIONAUTH_USER_API_KEY }
+        response = requests.post(url=api_url,json=data_user,headers=headers)
+
+        if response.status_code == 200:
+            user_data = response.json()
+            
+            user.fusionauth_user_id = user_data['user']['id']
+            user.save()
+
+            result_update = update_user(new_user,user_data)
+        
+
 def handle_import_users_errors(data_errors,new_user):
     for erros_type in data_errors:
         if erros_type == 'fieldErrors':
@@ -161,3 +200,5 @@ def handle_update_users_errors(data_errors):
                 for message in messages:
                     if message.get('code') == '[duplicate]registration':
                         return 'Usuário já registrado no FusionAuth e pode acessar normalmente!'
+                    else:
+                        return message.get('code')
