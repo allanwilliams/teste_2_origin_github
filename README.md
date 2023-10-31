@@ -18,7 +18,7 @@ Instale o Virtualenv, certifique-se de estar dentro da pasta do projeto ...
 
 Crie a Virtualenv ...
 ```sh
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate
 ```
 
@@ -30,6 +30,21 @@ pip install -r requirements.txt
 Configurando a .env
 ```sh
 cp .env_exemplo .env
+```
+
+### Instalando WKHTMLTOPDF no CentoOS7
+
+```
+yum install fontconfig libXext freetype libpng zlib libjpeg-turbo libpng libjpeg openssl icu libX11 libXext libXrender xorg-x11-fonts-Type1 xorg-x11-fonts-75dpi
+sudo yum install -y https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox-0.12.5-1.centos7.x86_64.rpm
+```
+
+### Instalação Font Arial
+```
+sudo apt install ttf-mscorefonts-installer
+sudo fc-cache -f
+fc-match Arial
+
 ```
 
 ## Integração com FusionAuth

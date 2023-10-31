@@ -296,10 +296,7 @@ WKHTMLTOPDF_CMD_OPTIONS = {
     'quiet': True,
 }
 
-# DJANGO SIMPLE SSO CONFIGS
-    # SSO_PRIVATE_KEY = 'NRj4jJXiEo0qnyMrDPKZR6OjxWy2T69WcRPnHNEi1xs13HOgEAfSeWVmRKnPEwG2'
-    # SSO_PUBLIC_KEY = 'nTe1vONx3Lbnfd3yqiyhz4cz00wYc4JBiIwmD92QgNaiqlnDpE6VngQ8bhkSRuod'
-    # SSO_SERVER = 'http://127.0.0.1:8000/server/'
+LOGIN_URL = '/admin'
 
 #FusionAuth CONFIGS
 # The below config values should be taken from FusionAuth application
