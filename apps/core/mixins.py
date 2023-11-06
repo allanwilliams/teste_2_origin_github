@@ -15,10 +15,12 @@ from reversion.revisions import is_active, set_comment
 from django.contrib.admin.options import ModelAdmin as MA
 from apps.core.encrypt_url_utils import encrypt
 from apps.core.utils import core_decrypt, core_encrypt,format
+from reversion import register
+import reversion
 
 LIST_PER_PAGE = 10
 
-
+@register
 class BaseModel(models.Model):
     criado_em = models.DateTimeField(blank=True, null=True)
     criado_por = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -56,11 +58,29 @@ class BaseModel(models.Model):
         for crypted_field in self.crypted_fields:
             new_value = core_encrypt(getattr(self, crypted_field))
             setattr(self, crypted_field, new_value)
-
-        super(BaseModel, self).save(force_insert=False,
-                                    force_update=False,
-                                    using=None,
-                                    update_fields=None)
+        
+        with reversion.create_revision():
+            if self.pk is not None:
+                changed_fields = []
+                for field in self._meta.fields:
+                    field_name = f'{field.name}_id' if isinstance(field, models.ForeignKey) else field.name
+                    if hasattr(self, f'get_{field_name}_display'):
+                        field_value = getattr(self, f'get_{field_name}_display')()
+                    else:
+                        field_value = getattr(self, field_name)
+                    try:
+                        if field_value != self.__class__.objects.get(pk=self.pk).__dict__[field_name]:
+                            changed_fields.append(field_name)
+                    except Exception: pass
+                comment = {"changed": {"fields": changed_fields}}
+            else:
+                comment = {}
+            
+            reversion.set_comment(json.dumps(comment))
+            super(BaseModel, self).save(force_insert=False,
+                                        force_update=False,
+                                        using=None,
+                                        update_fields=None)
     
     def get_encrypt_id(self):
         return encrypt(self.id)
