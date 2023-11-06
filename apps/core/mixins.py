@@ -42,11 +42,7 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
-    def save(self,
-             force_insert=False,
-             force_update=False,
-             using=None,
-             update_fields=None):
+    def save(self, *args, **kwargs):
         if get_current_user():
             if (not self.criado_por or not self.criado_em) and get_current_user() and get_current_user().id:
                 self.criado_por = get_current_user()
@@ -77,10 +73,7 @@ class BaseModel(models.Model):
                 comment = {}
             
             reversion.set_comment(json.dumps(comment))
-            super(BaseModel, self).save(force_insert=False,
-                                        force_update=False,
-                                        using=None,
-                                        update_fields=None)
+            super(BaseModel, self).save(*args, **kwargs)
     
     def get_encrypt_id(self):
         return encrypt(self.id)
