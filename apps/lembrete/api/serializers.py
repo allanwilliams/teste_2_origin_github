@@ -11,5 +11,5 @@ class LembretesSerializer(ModelSerializer): # pragma: no cover
 
     def get_documento(self,obj):
         if obj.documento:
-            path,file = str(obj.documento).split('/')
-            return str(f"/media/{path}/{encrypt(file)}")
+            diretorio,nome = str(obj.documento).split('/')
+            return str(f"/media/{diretorio}/{encrypt(nome)}")
