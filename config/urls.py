@@ -67,6 +67,7 @@ urlpatterns = [
     path("users/", include("apps.users.urls", namespace="users")),
     path('ajax_select/', include(ajax_select_urls)),
     path("certidao_localizacao/", include("apps.certidao_localizacao.urls", namespace="certidao_localizacao")),
+    path("lembrete/", include("apps.lembrete.urls", namespace="lembrete")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(
     settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

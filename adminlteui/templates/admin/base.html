@@ -45,7 +45,8 @@
     <link rel="apple-touch-icon" href="{% static "admin/dist/img/default-log.svg" %}">
     <link rel="icon" href="{% static "admin/dist/img/default-log.svg" %}">
     {% endif %}
-    <link rel="stylesheet" href="{% static 'css/custom_adminlte/nossa-v4.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom_adminlte/base-v4.css' %}?v=1.0">
+    <link rel="stylesheet" href="{% static 'admin/css/custom-navbar.css' %}?v=1.0">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -109,7 +110,38 @@
                 </div>
 
                 <div class="navbar-custom-menu">
+                    <input type="hidden" id="input-navbar-user-id" value="{{request.user.id}}">
                     <ul class="nav navbar-nav">
+                        {% if perms.lembrete.view_lembretes %}
+                        <li class="dropdown notifications-menu menu-lembretes">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <i class="far fa-bell"></i>
+                                <span class="label label-danger" id="count-lembretes-enviados"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="header">Meus Lembretes <span id="titulo-total-lembretes-enviados"></span> </li>
+                                <li class="lista-lembretes" id="lista-lembretes-enviados"></li>
+                                <li class="footer">
+                                    <a href="/admin/lembrete/lembretes/?verifica_origem=enviados&q=">Ver todos</a>
+                                    <a href="/admin/lembrete/lembretes/add/">Criar</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown notifications-menu menu-lembretes">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-bell"></i>
+                                <span class="label label-danger" id="count-lembretes-recebidos"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="header">Lembretes Recebidos <span id="titulo-total-lembretes-recebidos"></span></li>
+                                <li class="lista-lembretes" id="lista-lembretes-recebidos"></li>
+                                <li class="footer">
+                                    <a href="/admin/lembrete/lembretes/?verifica_origem=recebidos&lembrete_proprio__exact=0&q=">Ver todos</a>
+                                    <a href="/admin/lembrete/lembretes/add/">Criar</a>
+                                </li>
+                            </ul>
+                        </li>
+                        {% endif %}
                         <!-- User Account: style can be found in dropdown.less -->
                         <li class="dropdown user user-menu">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -203,6 +235,7 @@
                             <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
                             {% endif %}
                         </li>
+                        
                     </ul>
                 </div>
             </div>
@@ -578,7 +611,7 @@
 
 <script src="{% static 'tinymce_v5/tinymce.min.js' %}" ></script>
 <script src="{% static 'sweetalert2_v11/sweetalert2.all.min.js' %}" ></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
 <script>
 $.ajaxSetup({
     headers: {"X-CSRFToken": '{{ csrf_token }}' },
