@@ -107,8 +107,8 @@ class LembretesAdmin(AuditoriaAdmin): # pragma: no cover
 
     def get_documento(self, obj):
         if obj.documento:
-            path,file = str(obj.documento).split('/')
-            return format_html("<a href='{url}' target='_blank'><i class='fa-solid fa-cloud-arrow-down'></i></a>", url=f'/media/{path}/{encrypt(file)}')
+            diretorio,nome = str(obj.documento).split('/')
+            return format_html("<a href='{url}' target='_blank'><i class='fa-solid fa-cloud-arrow-down'></i></a>", url=f'/media/{diretorio}/{encrypt(nome)}')
         else:
             return '-'
     
