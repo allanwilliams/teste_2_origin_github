@@ -3,6 +3,7 @@ const userId = $('#input-navbar-user-id').val()
 $(function() {
     obterLembretesRecebidos();
     obterLembretesEnviados();
+    handlePreferencias()
 })
 
 function obterLembretesRecebidos() {
@@ -221,3 +222,121 @@ function reiniciarContador() {
 }
   
 document.addEventListener("mousemove", reiniciarContador);
+
+
+
+/* ================================ Preferências do usuário =====================================  */
+
+function handlePreferencias() {
+
+    function blockCheckPreferencias(bool){
+        $('#checkbox-liga-abas').attr('disabled',bool);
+        $('.check_preferencia').attr('disabled',bool);
+
+        (bool) ? $('.spin-preferencias').fadeIn() : $('.spin-preferencias').fadeOut();
+        
+        if (!bool) alert('Erro ao salvar as preferências do usuário')
+    }
+    
+    $('#checkbox-liga-abas').change(() => {
+        let value = $('#checkbox-liga-abas').is(":checked")
+        salvarPreferenciaAba(value)
+    })
+
+    $('#checkbox-liga-abas-perfil').change(() => {
+        let value = $('#checkbox-liga-abas-perfil').is(":checked")
+        salvarPreferenciaAba(value)
+    })
+
+    function salvarPreferenciaAba(value){
+        if(value !== undefined) {
+            $.ajax({
+                url: `/app-assistido/api/user/${userId}/`,
+                type: 'PATCH',
+                data: {'preferencia_abas': value},
+                beforeSend: () => {
+                    blockCheckPreferencias(true)
+                },
+                success: (data) => {
+                    window.location.reload();
+                },
+                error: () => {
+                    blockCheckPreferencias(false)
+                },
+            });
+        }
+    }
+    
+    $('.check_preferencia').change((e) => {
+        console.log('aquiiii')
+        const el = $(e.target)
+        let checked = el.is(":checked")
+        
+        let preferencia = el.attr('data-preferencia')
+        let id = el.attr('data-id')
+        const preferenciaTelaAntiga = '2'
+        
+        const redirect = () => {
+            if(preferencia === preferenciaTelaAntiga) {
+                
+                const pathName = window.location.pathname
+                const pathTelaNova = '/atendimento/assistido-processo/processo-visualizar/'
+                const pathTelaAntiga = '/admin/atendimento/processos/'
+                
+                if(checked && pathName.includes(pathTelaNova) ) {
+                    let id = pathName.replace(pathTelaNova, '').split('/')[0]
+                    if(id) {
+                        window.location.href = `${pathTelaAntiga}${id}/`
+                        return
+                    }
+                }
+                if(!checked && pathName.includes(pathTelaAntiga) ) {
+                    let id = pathName.replace(pathTelaAntiga, '').split('/')[0]
+                    if(id) {
+                        window.location.href = `${pathTelaNova}${id}/0/`
+                        return
+                    }
+                }
+            }
+            window.location.reload();
+        }
+
+        if(checked !== undefined) {
+            if(checked) {
+                $.ajax({
+                    url: `/users/api/user-preferencias/`,
+                    type: 'POST',
+                    data: {
+                        'user': userId,
+                        'preferencia': parseInt(preferencia)
+                    },
+                    beforeSend: () => {
+                        blockCheckPreferencias(true)
+                    },
+                    success: (data) => {
+                       redirect()
+                    },
+                    error: () => {
+                        blockCheckPreferencias(false)
+                    }
+                });
+            } else {
+                if(id) {
+                    $.ajax({
+                        url: `/users/api/user-preferencias/${id}`,
+                        type: 'DELETE',
+                        beforeSend: () => {
+                            blockCheckPreferencias(true)
+                        },
+                        success: (data) => {
+                            redirect()
+                        },
+                        error: () => {
+                            blockCheckPreferencias(false)
+                        }
+                    });
+                }
+            }
+        }
+    })
+}

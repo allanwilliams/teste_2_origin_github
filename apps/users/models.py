@@ -413,7 +413,7 @@ class DefensoresLotacoes(BaseModel):
 class UserPreferencias(BaseModel):
 
     class Tipos(models.IntegerChoices):
-        MENU_COMPACTO = 1, 'Habilitar menu compacto'
+        MENU_COMPACTO = 1, 'Menu fixo'
     
     user = models.ForeignKey(
         User,

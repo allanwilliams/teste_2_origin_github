@@ -55,7 +55,7 @@
     <![endif]-->
 
 </head>
-<body class="hold-transition skin-{% if adminlte.skin %}{{ adminlte.skin }}{% else %}blue{% endif %} sidebar-mini sidebar-collapse">
+<body class="hold-transition skin-{% if adminlte.skin %}{{ adminlte.skin }}{% else %}blue{% endif %} sidebar-mini {% if not request.user.get_user_preferencias.MENU_COMPACTO.value %} sidebar-collapse {% else %} fixed {% endif %}">
 <div class="wrapper">
     {% if not is_popup %}
     <header class="main-header">
@@ -123,6 +123,29 @@
                                     <a href="/admin/certidao_localizacao/certidao/add" title="Certidão">Emitir Certidão</a>
                                     <a href="/admin/certidao_localizacao/certidao" title="Certidão">2ª Via</a>
                                 </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown notifications-menu menu-lembretes">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-gear"></i>
+                                <span class="label label-danger"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="header">Minhas Preferências</li>
+                                <i id="spin-preferencias" class="spin-preferencias fa fa-spinner fa-spin fa-3x" style="color:#000; position: absolute; margin-left: calc(50% - 21px); margin-top:18px; display:none" ></i>
+                                {% for key, user_preferencia in request.user.get_user_preferencias.items %}
+                                    {% if key != 'URL' %}
+                                    <li style="padding: 10px;">
+                                        <span style="display: flex; justify-content: space-between; align-items: center; color: #000 !important;">
+                                            {{ user_preferencia.label }}
+                                            <label class="switch">
+                                                <input class='check_preferencia' type="checkbox" id="checkbox-preferencia-{{user_preferencia.id}}" data-preferencia="{{user_preferencia.id}}" {% if user_preferencia.value %} checked data-id="{{user_preferencia.value.id}}" {% endif %}>
+                                                <span class="slider round"></span>
+                                            </label>
+                                        </span>
+                                    </li>
+                                    {% endif %}
+                                {% endfor %}
                             </ul>
                         </li>
                         {% if perms.lembrete.view_lembretes %}
