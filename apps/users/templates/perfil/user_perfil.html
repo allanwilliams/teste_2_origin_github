@@ -315,7 +315,12 @@
 
                         (data.bairro) ? $('#id_bairro').val(data.bairro) : $('#id_bairro').val('');
 
-                        if (data.localidade) ? getCidade(data.localidade) : { $('#id_municipio').val(null); $('#id_municipio_text').val('') }
+                        if (data.localidade){
+                            getCidade(data.localidade)   
+                        }else{
+                            $('#id_municipio').val(null);
+                            $('#id_municipio_text').val('')
+                        }
                     })
                 }
             }
