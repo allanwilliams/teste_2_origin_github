@@ -86,7 +86,7 @@
     color: var(--multi-text-color);
     background: var(--multi-hover-sidebar);
     border-left-color: var(--multi-left-border-sidebar-select);
-    transition: all ease-in-out 1s;
+    /* transition: all ease-in-out 1s; */
 }
 
 .treeview-menu.menu-open{
@@ -657,6 +657,80 @@ input[type="number"], input[type="password"] {
     justify-content: space-between;
 }
 
+.user-header .label-edit-perfil {
+    position: relative;
+    background: #0000007a;
+    padding: 5px;
+    border-radius: 100%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.user-header .user-header-foto {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 5px;
+}
+
+.user-header .user-header-foto .img-circle {
+    border: 3px solid lightgray;
+    margin-left: 40px; 
+    width: 90px; 
+    height:90px;
+}
+
+.user-header .user-header-foto .img-circle:hover {
+    border: 3px solid #278261;
+}
+
+.navbar-custom-menu>.navbar-nav>li>.side-perfil {
+    border-radius: 30px;
+    border: 10px solid lightgray;
+    margin: 12px 7px 0 0;
+    height: 37em;
+    width: 26em !important;
+}
+
+.navbar-custom-menu>.navbar-nav>li>.side-perfil-colab {
+    height: 32em;
+}
+
+.navbar-nav>.user-menu>.dropdown-menu>li.user-header>p {
+    color: gray;
+}
+
+.navbar-nav>.user-menu>.dropdown-menu>.user-footer {
+    background-color: transparent;
+}
+
+.icone-dropdown-perfil img {
+    width: 80px;
+    cursor: pointer;
+    border: 3px solid lightgray;
+    border-radius: 50%;
+    padding: 3px;
+}
+
+.icone-dropdown-perfil:hover img {
+    border: 3px solid #278261;
+}
+
+.icone-dropdown-perfil {
+    margin: 1em 0;
+}
+
+.icone-dropdown-perfil small {
+    color: gray;
+}
+
+.mb-1{
+    margin-bottom: 1em;
+}
 
 @media (min-width: 768px) {
     .main-sidebar {

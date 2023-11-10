@@ -31,6 +31,7 @@ class User(AbstractUser):
     }
   
     name = CharField(_("Nome Completo"), blank=True, max_length=255)
+
     papel = models.ForeignKey(
         'users.Papeis',
         verbose_name='Papeis',
@@ -39,6 +40,7 @@ class User(AbstractUser):
         null=True,
         db_index=True,
     )
+
     matricula = models.CharField(
         'Matricula',
         max_length=11,
@@ -46,6 +48,7 @@ class User(AbstractUser):
         unique=True,
         blank=True,
         null=True)
+    
     num_orgao_classe = CharField(_("Número do Órgão de Classe"),
                                  blank=True,
                                  null=True,
@@ -61,8 +64,106 @@ class User(AbstractUser):
     
     fusionauth_user_id = models.CharField('FusionAuth user ID',max_length=50,blank=True, null=True)
 
-    crypted_fields = ['cpf',]
+    foto = models.ImageField('Foto', upload_to='user_foto', blank=True, null=True)
+
+    nacionalidade = models.ForeignKey(
+        'contrib.Nacionalidades',
+        on_delete=models.PROTECT,
+        related_name='%(class)s_nacionalidade',
+        blank=True,
+        null=True,
+        default=None
+    )
+
+    escolaridade = models.ForeignKey('contrib.Escolaridades',on_delete=models.PROTECT,
+        related_name='%(class)s_escolaridade',
+        null=True, blank=True)
     
+    endereco = models.CharField(
+        'Endereço',
+        max_length=200,
+        blank=True,
+        null=True,
+    )
+
+    numero = models.CharField(
+        'Número',
+        max_length=11,
+        blank=True,
+        null=True,
+    )
+
+    complemento = models.CharField(
+        'Complemento',
+        max_length=200,
+        blank=True,
+        null=True,
+    )
+
+    cep = models.CharField(
+        'CEP',
+        max_length=200,
+        blank=True,
+        null=True,
+    )
+
+    bairro = models.CharField(
+        'Bairro',
+        max_length=200,
+        blank=True,
+        null=True,
+    )
+
+    telefone = models.CharField(
+        'Telefone',
+        max_length=200,
+        blank=True,
+        null=True,
+    )
+
+    municipio = models.ForeignKey(
+        'contrib.Municipios',
+        on_delete=models.PROTECT,
+        related_name='%(class)s_municipios',
+        blank=True,
+        null=True
+    )
+
+    estado_civil = models.ForeignKey(
+        'contrib.EstadosCivis',
+        on_delete=models.PROTECT,
+        related_name='%(class)s_estado_civil',
+        blank=True,
+        null=True,
+    )
+
+    estado = models.ForeignKey(
+        "contrib.Estados",
+        on_delete=models.DO_NOTHING,
+        related_name='%(class)s_usuarioestado',
+        null=True
+    )
+
+    rg = models.CharField(
+        'RG',
+        max_length=200,
+        blank=True,
+        null=True,
+    )
+
+    nome_mae = models.CharField(
+        'Nome da Mãe',
+        max_length=200,
+        blank=True,
+        null=True,
+    )
+
+    data_nascimento = models.DateField('Data de nascimento', null=True, blank=True)
+
+    email_alternativo = models.EmailField('Email alternativo', blank=True, null=True)
+
+    crypted_fields = ['cpf',]
+
     def save(self,
              force_insert=False,
              force_update=False,
@@ -81,9 +182,10 @@ class User(AbstractUser):
         if self.id and self.first_name:
             self.user_str = '{:08n} {} {} ({})'.format(self.id, self.first_name, self.last_name,self.username)
         
-        for crypted_field in self.crypted_fields:
-            new_value = core_encrypt(core_decrypt(getattr(self, crypted_field)))
-            setattr(self, crypted_field, new_value)
+        if hasattr(self,'crypted_fields'):
+            for crypted_field in self.crypted_fields:
+                new_value = core_encrypt(core_decrypt(getattr(self, crypted_field)))
+                setattr(self, crypted_field, new_value)
 
         super(User, self).save(
             force_insert=False,
@@ -97,12 +199,13 @@ class User(AbstractUser):
 
     @classmethod
     def from_db(cls, db, field_names, values):
-        for crypted_field in cls.crypted_fields:
-            index = field_names.index(crypted_field)
-            new_value = core_decrypt(values[index])
-            new_values = list(values)
-            new_values[index] = new_value
-            values = tuple(new_values)
+        if hasattr(cls,'crypted_fields'):
+            for crypted_field in cls.crypted_fields:
+                index = field_names.index(crypted_field)
+                new_value = core_decrypt(values[index])
+                new_values = list(values)
+                new_values[index] = new_value
+                values = tuple(new_values)
         return super().from_db(db, field_names, values)
         
     def save_userdata(self): # pragma: no cover
@@ -148,7 +251,7 @@ class User(AbstractUser):
 
     def userdata_list_fields(self): # pragma: no cover
         return [
-            'cpf',
+            'cpf','rg'
         ]
 
     def is_defensor(self):

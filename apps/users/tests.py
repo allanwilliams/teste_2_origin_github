@@ -4,10 +4,12 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.contrib.auth.models import Group
 from apps.users.models import User,UserPreferencias, Defensores, Papeis, DefensoresLotacoes
 from apps.users.forms import UserCreationForm, ImportarUsuariosForm
+from apps.contrib.models import Estados
 from io import BytesIO
 
 username = 'teste.user'
 name = "Teste User"
+user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'
 
 class UserModelTest(TestCase):
     def setUp(self):
@@ -129,15 +131,32 @@ class UserImportTest(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_import_user_duplicado_request(self):
-        user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'
         response = self.client.post('/users/importar-usuarios', {'file': self.arquivo_csv_duplicado},HTTP_USER_AGENT=user_agent)
         self.assertEqual(response.status_code, 200,response)
 
     def test_import_user_request(self):
-        user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'
         response = self.client.post('/users/importar-usuarios', {'file': self.arquivo_csv},HTTP_USER_AGENT=user_agent)
         self.assertEqual(response.status_code, 200,response)
     
+class UserProfileTest(TestCase):
+    def setUp(self):
+        self.user = User(name='name', username=username,password=settings.USER_PASSWORD_TEST,is_staff=True)
+        self.user.save()
+
+        self.estado = Estados(nome='Estado teste')
+        self.estado.save()
+    
+    def test_profile(self):
+        self.client.force_login(self.user)
+        response = self.client.get(f'/users/perfil/{self.user.id}',HTTP_USER_AGENT=user_agent)
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_profile(self):
+        self.client.force_login(self.user)
+        response = self.client.post(f'/users/perfil/{self.user.id}',{'cpf':'1234567890','estado':self.estado.id},HTTP_USER_AGENT=user_agent)
+        self.assertEqual(response.url, f'/users/perfil/{self.user.id}')
+        
+
 
 class PapeisModelTest(TestCase):
     def setUp(self):

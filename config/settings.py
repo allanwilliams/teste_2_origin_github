@@ -105,6 +105,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.session.context_processors.custom_context'
             ],
         },
     },
@@ -184,10 +185,14 @@ SIMPLE_JWT = {
 }
 
 DOMINIO_ATUAL = env('DOMINIO_ATUAL', default='localhost:8000')
+DASHBOARD = "/core/dash-blog/"
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 CONSTANCE_CONFIG = {
    'DOMINIO_ATUAL': (DOMINIO_ATUAL,
                 'Dominio atual do sistema',
+                str),
+   'DASHBOARD': (DASHBOARD,
+                'URL homepage',
                 str),
 }
 

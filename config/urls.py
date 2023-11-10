@@ -10,16 +10,13 @@ from rest_framework_simplejwt.views import TokenVerifyView, TokenObtainPairView,
 from ajax_select import urls as ajax_select_urls
 from apps.core.pastas_bloquedas import pastas_bloqueadas,arr_media_year_month
 from apps.core.encrypt_url_utils import decrypt
+from apps.core.views import dash
 import os
 
 @login_required
 def secure_file(request,nome_arquivo,year = None,month=None):
-    #raise Http404
     access = False
     split_meta = str(request.META['PATH_INFO']).split('/')
-    # file = split_meta.pop()
-    # print(file)
-    # split_meta = '/'.join(split_meta)
     for pasta in pastas_bloqueadas.keys():        
         if pasta == split_meta[2]:
             for accesses in pastas_bloqueadas[pasta]:
@@ -68,7 +65,16 @@ urlpatterns = [
     path('ajax_select/', include(ajax_select_urls)),
     path("certidao_localizacao/", include("apps.certidao_localizacao.urls", namespace="certidao_localizacao")),
     path("lembrete/", include("apps.lembrete.urls", namespace="lembrete")),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(
+]
+
+
+for pasta in pastas_bloqueadas.keys():
+    if pasta in arr_media_year_month:
+        urlpatterns += [path('media/' + pasta + '/<int:year>/<int:month>/<str:nome_arquivo>',secure_file)]
+
+    urlpatterns += [path('media/' + pasta + '/<str:nome_arquivo>',secure_file)]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(
     settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.USE_FUSIONAUTH:
@@ -79,5 +85,6 @@ if settings.USE_FUSIONAUTH:
 else:
     urlpatterns += [ path('', RedirectView.as_view(url=reverse_lazy('admin:index'))) ]
 
+urlpatterns += [path('admin/', dash,name='override_home')]
 urlpatterns += [path('admin/', admin.site.urls),]
 

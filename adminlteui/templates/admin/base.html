@@ -1,4 +1,4 @@
-{% load i18n static adminlte_options adminlte_menu %}<!DOCTYPE html>
+{% load i18n static adminlte_options adminlte_menu templatetags_fieldset %}<!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 
 {% get_adminlte_settings as adminlte %}
@@ -55,7 +55,7 @@
     <![endif]-->
 
 </head>
-<body class="hold-transition skin-{% if adminlte.skin %}{{ adminlte.skin }}{% else %}blue{% endif %} sidebar-mini fixed">
+<body class="hold-transition skin-{% if adminlte.skin %}{{ adminlte.skin }}{% else %}blue{% endif %} sidebar-mini sidebar-collapse">
 <div class="wrapper">
     {% if not is_popup %}
     <header class="main-header">
@@ -112,6 +112,19 @@
                 <div class="navbar-custom-menu">
                     <input type="hidden" id="input-navbar-user-id" value="{{request.user.id}}">
                     <ul class="nav navbar-nav">
+                        <li class="dropdown notifications-menu menu-lembretes">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-map-marker"></i>
+                                <span class="label label-danger"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="header">Certidão de localização</li>
+                                <li class="footer">
+                                    <a href="/admin/certidao_localizacao/certidao/add" title="Certidão">Emitir Certidão</a>
+                                    <a href="/admin/certidao_localizacao/certidao" title="Certidão">2ª Via</a>
+                                </li>
+                            </ul>
+                        </li>
                         {% if perms.lembrete.view_lembretes %}
                         <li class="dropdown notifications-menu menu-lembretes">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -141,94 +154,81 @@
                                 </li>
                             </ul>
                         </li>
-                        {% endif %}
-                        <!-- User Account: style can be found in dropdown.less -->
                         <li class="dropdown user user-menu">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                {% get_adminlte_option 'show_avatar' as adminlte_show_avatar  %}
-                                {% if adminlte_show_avatar.valid and adminlte_show_avatar.show_avatar == 'on' %}
-                                {% get_adminlte_option 'avatar_field' request as adminlte_avatar_field  %}
-                                {% if adminlte_avatar_field.valid and adminlte_avatar_field.avatar_field %}
-                                <img src="{{ adminlte_avatar_field.avatar_field }}" class="user-image" alt="User Image" style="width: 25px; height:25px;">
+                             
+                                {% if request.user and request.user.foto %}
+                                <img src="{{ request.user.foto.url|encfile }}" class="user-image" style="width: 30px; height:30px; background-color: #fff;">
                                 {% else %}
-                                <img src={% static "admin/dist/img/default.jpg" %} class="user-image" alt="User Image">
+                                <img src="{% static 'images/user_placeholder.png' %}" class="user-image" style="width: 30px; height:30px; background-color: #fff;">
                                 {% endif %}
-                                {% endif %}
-                                <span class="hidden-xs">{{ request.user.first_name|default:'-' }} {{ request.user.last_name|default:'' }}</span>
+                                <i class="fa fa-user hidden-lg hidden-md hidden-sm"></i>
+                                <span class="hidden-xs">{{ request.user.first_name }} {{ request.user.last_name }}</span>
                             </a>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu side-perfil {% if not request.user.is_defensor %} side-perfil-colab {% endif %}">
                                 <!-- User image -->
-                                {% get_adminlte_option 'show_avatar' as adminlte_show_avatar  %}
-                                {% if adminlte_show_avatar.valid and adminlte_show_avatar.show_avatar == 'on' %}
-                                <li class="user-header">
-                                    {% get_adminlte_option 'avatar_field' request as adminlte_avatar_field  %}
-                                    {% if adminlte_avatar_field.valid and adminlte_avatar_field.avatar_field %}
-                                    <img src="{{ adminlte_avatar_field.avatar_field }}" class="img-circle" alt="User Image" style="width: 90px; height:90px;">
-                                    {% else %}
-                                    <img src={% static "admin/dist/img/default.jpg" %} class="img-circle" alt="User Image">
-                                    {% endif %}
-                                    <p>
-                                        {{ request.user.first_name|default:'-' }} {{ request.user.last_name|default:'' }} -
-                                        {% if request.user.is_superuser %}
-                                        {% trans "Super manager" %}
-                                        {% else %}
-                                        {% if request.user.groups.all %}
-                                        {% for i in request.user.groups.all %}{{ i.name }}{% endfor %}
-                                        {% else %}
-                                        {% trans 'Normal' %}
-                                        {% endif %}
-                                        {% endif %}
-                                        <small>{% trans "Register time" %}： {{ request.user.date_joined }}</small>
-                                    </p>
-                                </li>
-                                {% else %}
+                                {% comment %} {% get_adminlte_option 'show_avatar' as adminlte_show_avatar  %}
+                                {% if adminlte_show_avatar.valid and adminlte_show_avatar.show_avatar == 'on' %} {% endcomment %}
                                 <li class="user-header" style="height: auto;">
+                                    <div class="user-header-foto">
+                                        {% if request.user and request.user.foto %}
+                                        <img src="{{ request.user.foto.url|encfile }}" class="img-circle">
+                                        {% else %}
+                                        <img src="{% static 'images/user_placeholder.png' %}" class="img-circle">
+                                        {% endif %}
+                                        <label data-toggle="tooltip" data-placement="top" class="label-edit-perfil" data-original-title="Editar Perfil">
+                                            <a style="color: #fff;" href="/users/perfil/{{request.user.id}}"><i class="fa-solid fa-pencil"></i></a>
+                                        </label>
+                                    </div>
                                     <p>
-                                        {{ request.user.first_name|default:'-' }} {{ request.user.last_name|default:'' }} -
-                                        {% if request.user.is_superuser %}
-                                        {% trans "Super manager" %}
-                                        {% else %}
-                                        {% if request.user.groups.all %}
-                                        {% for i in request.user.groups.all %}{{ i.name }}{% endfor %}
-                                        {% else %}
-                                        {% trans 'Normal' %}
-                                        {% endif %}
-                                        {% endif %}
-                                        <small>{% trans "Register time" %}： {{ request.user.date_joined }}</small>
+                                        <strong>{{ request.user.first_name }} {{ request.user.last_name }}</strong> 
+                                        <br>
+                                        <small>
+                                            {% if request.user.papel %}{{request.user.papel}}{% endif %} 
+                                            <br>
+                                            Usuário desde: {{ request.user.date_joined }}
+                                        </small>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-md-4 col-xs-4">
+                                                <a class="icone-dropdown-perfil" title="E-Mail"  href="https://mail.defensoria.ce.def.br/" target="_blank" id='email_zimbra'>
+                                                    <img src="{% static 'imagens/email.png' %}" height="80px" width="80px"/><br>
+                                                    <small>E-Mail</small>
+                                                </a>
+                                            </div>
+                                            <div class="col-md-4 col-xs-4">
+                                                <a class="icone-dropdown-perfil" title="Escola" href="https://ead.defensoria.ce.def.br/" target="_blank" id='escola'>
+                                                    <img src="{% static 'imagens/escola.png' %}" height="80px" width="80px"/><br>
+                                                    <small>Escola</small>
+                                                </a>
+                                            </div>
+                                            <div class="col-md-4 col-xs-4"> 
+                                                <a class="icone-dropdown-perfil" title="Almoxarifado" href="https://almoxarifado.defensoria.ce.def.br/" target="_blank" id='almoxarifado'/>
+                                                    <img src="{% static 'imagens/almoxarifado.jpg' %}" height="80px" width="80px"/><br>
+                                                    <small>Almoxarifado</small>
+                                                </a>
+                                            </div>
+                                        </div>      
                                     </p>
                                 </li>
-                                {% endif %}
-
-                                <!-- Menu Body -->
-                                <!--<li class="user-body">-->
-                                <!--<div class="row">-->
-                                <!--<div class="col-xs-4 text-center">-->
-                                <!--<a href="#">Followers</a>-->
-                                <!--</div>-->
-                                <!--<div class="col-xs-4 text-center">-->
-                                <!--<a href="#">Sales</a>-->
-                                <!--</div>-->
-                                <!--<div class="col-xs-4 text-center">-->
-                                <!--<a href="#">Friends</a>-->
-                                <!--</div>-->
-                                <!--</div>-->
-                                <!--&lt;!&ndash; /.row &ndash;&gt;-->
-                                <!--</li>-->
-                                <!-- Menu Footer-->
                                 <li class="user-footer">
-                                    <div class="pull-left">
-                                        {% if use_fusionauth %}
-                                            <a  href="/django_sso_app/sso-change-password" class="btn btn-default btn-flat">{% trans 'Change password' %}</a>
-                                        {% else %}
-                                            <a  href="/admin/password_change/" class="btn btn-default btn-flat">{% trans 'Change password' %}</a>
-                                        {% endif %}
-                                    </div>
-                                    <div class="pull-right">
-                                        <a href="{% url 'admin:logout' %}" class="btn btn-default btn-flat">{% trans 'Log out' %}</a>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-6" style="text-align: center;">
+                                            {% if use_fusionauth %}
+                                                <a  href="/django_sso_app/sso-change-password" class="btn btn-default btn-flat">{% trans 'Change password' %}</a>
+                                            {% else %}
+                                                <a  href="/admin/password_change/" class="btn btn-default btn-flat">{% trans 'Change password' %}</a>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6 col-xs-6" style="text-align: center;">
+                                            <a href="/admin/logout/" class="item-footer"><i class="fa-solid fa-power-off"></i> Encerrar sessão</a>
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
                         </li>
+                        {% endif %}
                         <!-- Control Sidebar Toggle Button -->
                         <li>
                             {% if adminlte.demo %}
