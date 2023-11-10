@@ -52,12 +52,12 @@
                         <div style='display:flex; align-items: center;justify-content:center'>
                             {% if user.foto %}
                             <a rel='noopener' href="{{user.foto.url|encfile}}" target="_blank">
-                                <img alt='foto-usuario' id="img-assistido" class="img-circle img-user"
+                                <img alt='' id="img-assistido" class="img-circle img-user"
                                     style="background-image: url('{{user.foto.url|encfile}}')">
                             </a>
                             {% else %}
                                 <a>
-                                    <img alt='foto-usuario' onclick="escolherFoto()" id="img-assistido" class="img-circle img-user"
+                                    <img alt='' onclick="escolherFoto()" id="img-assistido" class="img-circle img-user"
                                         style="background-image: url('{% static 'images/user_placeholder.png' %}')">
                                 </a>
                             {% endif %}
