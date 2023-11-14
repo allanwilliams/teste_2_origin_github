@@ -15,7 +15,7 @@ Esse template possui 2 temas previamente configurados
 - AdminLTE
 - Django-jazzmin
 
-para escolher entre eles basta incluir o parâetro DEFAULT_THEME em sua .env, caso o parâmetro não seja incluido o tema AdminLTE será utilizado por padrão
+para escolher entre eles basta incluir o parâmetro DEFAULT_THEME em sua .env, caso o parâmetro não seja incluido o tema AdminLTE será utilizado por padrão
 
 
 .env
