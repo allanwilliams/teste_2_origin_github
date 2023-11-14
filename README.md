@@ -8,7 +8,21 @@ Esse é um template base para criação de novos projetos baseados em Django Adm
 - [Django](https://www.djangoproject.com/) - Verison 3.2.7
 - [Python](https://www.python.org/) - version 3.8.*
 
+## TEMAS
 
+Esse template possui 2 temas previamente configurados
+
+- AdminLTE
+- Django-jazzmin
+
+para escolher entre eles basta incluir o parâetro DEFAULT_THEME em sua .env, caso o parâmetro não seja incluido o tema AdminLTE será utilizado por padrão
+
+
+.env
+```
+DEFAULT_THEME=jazzmin.apps.JazzminConfig # para habilitar o tema Django-jazzmin
+DEFAULT_THEME=adminlteui.apps.AdminlteUIConfig # para habilitar o tema AdminLTE
+```
 
 ## Instalação
 Instale o Virtualenv, certifique-se de estar dentro da pasta do projeto ...
@@ -102,13 +116,13 @@ source venv/bin/activate
 Executando todos dos testes
 
 ```
-coverage run --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" manage.py test apps --settings config.cicd_settings;coverage html --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" -d tests/coverage; coverage xml -i
+coverage run --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*,jazzmin/*" manage.py test apps --settings config.cicd_settings;coverage html --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*,jazzmin/*" -d tests/coverage; coverage xml -i
 ```
 
 Executando testes por app
 
 ```
-coverage run manage.py test apps/{nome_do_app}; coverage html --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*" -d tests/coverage
+coverage run manage.py test apps/{nome_do_app}; coverage html --omit="*/venv/*,config/*,static/*,staticfiles/*,adminlteui/*,jazzmin/*" -d tests/coverage
 ```
 
 Os resultados dos testes serão gravados na pasta tests/coverage/ e podem ser acessados abrindo o arquivo tests/coverage/index.html
