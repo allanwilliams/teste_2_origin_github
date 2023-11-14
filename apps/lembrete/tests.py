@@ -57,4 +57,4 @@ class LembretesModelTest(TestCase):
         self.assertTrue(form.is_valid(),form.errors)
 
         lembrete = form.save()
-        self.assertTrue("Lembrete Teste - 00" in str(lembrete),lembrete)
+        self.assertTrue("Lembrete teste form - 00" in str(lembrete),lembrete)

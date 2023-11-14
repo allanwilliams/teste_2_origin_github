@@ -27,7 +27,7 @@ class LembretesForm(forms.ModelForm):
                     </ul>
                 """
             )
-        if 'instance' in kwargs:
+        if 'instance' in kwargs: # pragma: no cover
             if kwargs.get('instance') and kwargs['instance'].criado_por != get_current_authenticated_user():
                 for f in list(self.fields):
                     self.fields[f].disabled = True

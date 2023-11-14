@@ -54,9 +54,12 @@ DJANGO_APPS = [
     'rangefilter',
     'ajax_select'
 ]
+DEFAULT_THEME = env('DEFAULT_THEME',default='adminlteui.apps.AdminlteUIConfig') 
+if DEFAULT_THEME == 'jazzmin.apps.JazzminConfig':
+    from .jazzmin_settings import JAZZMIN_SETTINGS, JAZZMIN_UI_TWEAKS
 
 THIRD_PARTY_APPS = [
-    "adminlteui.apps.AdminlteUIConfig",
+    DEFAULT_THEME,
     'constance',
     'constance.backends.database',
     'mozilla_django_oidc',

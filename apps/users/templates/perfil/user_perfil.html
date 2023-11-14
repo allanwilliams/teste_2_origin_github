@@ -1,5 +1,5 @@
 {% extends 'admin/base.html' %}
-{% load static templatetags_fieldset %}
+{% load static core_fieldset %}
 
 {% block extrastyle %}
 <link rel="stylesheet" href="{% static 'ajax_select/css/ajax_select.css' %}">
@@ -304,7 +304,7 @@
             const cep = input.value.replace(/\D/g, '');
 
             if (cep != "") {
-                const validacep = /^[\d]{8}$/;
+                const validacep = /^[0-9]{8}$/;
 
                 if (validacep.test(cep)) {
                     $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
@@ -329,7 +329,7 @@
 
     function getCidade(cidade) {
         $.getJSON(`/contrib/api/municipios/?nome=${cidade}`, (data) => {
-            if (data && data.results) {
+            if (data?.results) {
                 const local = data.results[0]
                 if (local.id && local.municipio_estado) {
                     $('#id_municipio').val(local.id)

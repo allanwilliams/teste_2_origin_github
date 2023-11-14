@@ -63,23 +63,25 @@ def user_perfil(request, id):
     user =  User.objects.filter(pk=request.user.id).first()
     if id and id != 0:
         user = User.objects.filter(pk=id).first()
+    if user:
+        form = PerfilForm(request.POST or None, request.FILES or None, instance=user)
+        
+        if request.method == 'POST':
+            if form.is_valid():
+                try:
+                    form.save()
+                    messages.success(request, 'Usuário atualizado com sucesso!')
+                except Exception: # pragma: no cover
+                    messages.error(request, 'Erro ao atualizar Usuário!')
 
-    form = PerfilForm(request.POST or None, request.FILES or None, instance=user)
-    
-    if request.method == 'POST':
-        if form.is_valid():
-            try:
-                form.save()
-                messages.success(request, 'Usuário atualizado com sucesso!')
-            except Exception: # pragma: no cover
-                messages.error(request, 'Erro ao atualizar Usuário!')
+                return redirect(f'/users/perfil/{id}')
 
-            return redirect(f'/users/perfil/{id}')
+        context = {
+            'form': form,
+            'user': user,
+            'editavel': request.user.id == user.id or request.user.is_superuser,
+        }
+        
+        return render(request, 'perfil/user_perfil.html', context)
 
-    context = {
-        'form': form,
-        'user': user,
-        'editavel': request.user.id == user.id or request.user.is_superuser,
-    }
-    
-    return render(request, 'perfil/user_perfil.html', context)
+    return redirect('/') # pragma: no cover

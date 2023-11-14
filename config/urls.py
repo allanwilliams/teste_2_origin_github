@@ -8,7 +8,7 @@ from django_currentuser.middleware import get_current_authenticated_user
 from django.http import FileResponse, Http404
 from rest_framework_simplejwt.views import TokenVerifyView, TokenObtainPairView, TokenRefreshView
 from ajax_select import urls as ajax_select_urls
-from apps.core.pastas_bloquedas import pastas_bloqueadas,arr_media_year_month
+from apps.core.pastas_bloquedas import pastas_bloqueadas
 from apps.core.encrypt_url_utils import decrypt
 from apps.core.views import dash
 import os
@@ -69,9 +69,6 @@ urlpatterns = [
 
 
 for pasta in pastas_bloqueadas.keys():
-    if pasta in arr_media_year_month:
-        urlpatterns += [path('media/' + pasta + '/<int:year>/<int:month>/<str:nome_arquivo>',secure_file)]
-
     urlpatterns += [path('media/' + pasta + '/<str:nome_arquivo>',secure_file)]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(

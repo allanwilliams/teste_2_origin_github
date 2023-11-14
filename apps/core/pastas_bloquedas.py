@@ -29,9 +29,3 @@
 pastas_bloqueadas = {
         'user_foto':['all'],
 }
-
-arr_media_year_month = [
-'reg_civil_anexos_instituicao',
-'reg_civil_anexos_defensoria',
-'reg_civil_anexos_lavratura'
-                        ]

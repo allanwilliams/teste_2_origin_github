@@ -61,3 +61,4 @@ django-utils-six==2.0
 redis==3.2.1
 django-picklefield==3.1
 Pillow==9.3.0
+django-jazzmin==2.6.0

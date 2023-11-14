@@ -122,27 +122,3 @@ def boolean_sim_ou_nao(value):
 @register.filter('to_str')
 def to_str(int):
     return str(int)
-
-@register.filter
-def encfile(src):
-    if src:
-        if 'media/' not in src:
-            path = src.split('/')
-            name = path.pop()
-            path = '/'.join(path)
-            return f'{path}/{encrypt(name)}'
-        else:
-            arr_media = src.split('/')
-            name = arr_media[-1]
-            media = arr_media[1]
-            arr_media.pop(0)
-            arr_media.pop(0)
-            
-            name = arr_media.pop()
-            if arr_media:
-                path = '/'.join(arr_media)
-                return f'/{media}/{path}/{encrypt(name)}'
-        
-@register.filter
-def dd(src):
-    return dir(src)
