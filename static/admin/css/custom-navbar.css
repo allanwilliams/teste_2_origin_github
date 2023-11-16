@@ -276,7 +276,7 @@ li.user-header>p {
     display: flex;
 }
 
-i.fa {
+.navbar > i.fa {
     color: #fff;
 }
 
