@@ -101,7 +101,7 @@ PAPEL[Colaborador(a)]
 
 - Configurações de Grupos
 
-As roles de grupo deverão possuir a palavra chave GRUPO(caixa alta) e o nome do grupo dentro de [] (cochetes)
+As roles de grupo deverão possuir a palavra chave GRUPO(caixa alta) e o nome do grupo (Exatamente como está cadastrado no sistema) dentro de "[]" (cochetes)
 
 exemplo:
 ```
