@@ -83,5 +83,5 @@ def user_perfil(request, id):
         }
         
         return render(request, 'perfil/user_perfil.html', context)
-
+    messages.error(request, 'Usuário não localizado!')
     return redirect('/') # pragma: no cover
