@@ -39,7 +39,6 @@
         {% endfor %}
     </ul>
 </li>
-{% if perms.lembrete.view_lembretes %}
 <li class="dropdown notifications-menu menu-lembretes nav-item">
     <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false">
         <i class="far fa-bell"></i>
@@ -138,7 +137,6 @@
         </li>
     </ul>
 </li>
-{% endif %}
 
 {% block extrahead %}
 <script src={% static "admin/plugins/jQuery/jquery-2.2.3.min.js" %}></script>
