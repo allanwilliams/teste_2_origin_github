@@ -92,6 +92,7 @@
             <div class="col-md-8">  
                 <div class="box box-primary">
                     <div style="padding: 0 10px;height: 17em; display:flex; gap:1em;justify-content:center" class="box-body">
+                        {% if user == request.user %}
                         <div style="width: 100%;">
                             <p style="font-size: 1.3em; font-weight:700;padding-top: 10px" class="box-title">Credenciais</p>
                             <ul class="list-group list-group-unbordered">
@@ -115,6 +116,7 @@
                                 {% endfor %}
                             </ul>
                         </div>
+                        {% endif %}
                         {% if user.groups.all %}
                             <div style="width: 100%;">
                                 <p style="font-size: 1.3em; font-weight:700;padding-top: 10px" class="box-title">Grupos</p>
