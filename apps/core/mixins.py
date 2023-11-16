@@ -61,7 +61,7 @@ class BaseModel(models.Model):
             setattr(self, crypted_field, new_value)
         
         with reversion.create_revision():
-            comment = {}
+            comment = []
             if original and self._meta.model_name not in ['userpage','usersession']:
                 try:
                     changed_fields = []
@@ -72,10 +72,11 @@ class BaseModel(models.Model):
                             original_value = getattr(original, field_name)
                             if field_value != original_value:
                                 changed_fields.append(field_name)
-                    comment = {"changed": {"fields": changed_fields}}
+                    if len(changed_fields) > 0:
+                        comment = [{"changed": {"fields": changed_fields}}]
                 except Exception: pass                
             
-            reversion.set_comment(json.dumps([comment]))
+            reversion.set_comment(json.dumps(comment))
             reversion.set_user(get_current_authenticated_user())
             super(BaseModel, self).save(*args, **kwargs)
     

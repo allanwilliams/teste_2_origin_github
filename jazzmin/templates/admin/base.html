@@ -50,7 +50,7 @@
     {% block extrastyle %} {% endblock %}
     {% block extrahead %} {% endblock %}
 </head>
-<body class="hold-transition{% if not jazzmin_settings.show_sidebar %} no-sidebar{% else %} sidebar-mini{% endif %} {% sidebar_status request %} {% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %} {{ jazzmin_ui.body_classes }} {% if jazzmin_ui.dark_mode_theme %}theme-dark{% endif %}" data-admin-utc-offset="{% now "Z" %}">
+<body class="hold-transition{% if not jazzmin_settings.show_sidebar %} no-sidebar{% else %} sidebar-mini{% endif %} {% sidebar_status request %} {% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %} {{ jazzmin_ui.body_classes }} {% if jazzmin_ui.dark_mode_theme %}theme-dark{% endif %} {% if request.user.get_user_preferencias.MENU_COMPACTO.value %}sidebar-collapse{% endif %}" data-admin-utc-offset="{% now "Z" %}">
 
 <div class="wrapper">
 
@@ -143,9 +143,9 @@
                                         value="{{ language.code }}"
                                         class="dropdown-item {% if language.code == LANGUAGE_CODE %}active{% endif %}"
                                         lang="{{ language.code }}"
-                                    >
-                                        {{ language.name_local|title }}
-                                    </button>
+                                    >$.ajaxSetup({
+                                        headers: {"X-CSRFToken": '{{ csrf_token }}' },
+                                    });
                                 {% endfor %}
                             </form>
                         </div>
@@ -325,6 +325,11 @@
 <script src="{% static "vendor/adminlte/js/adminlte.min.js" %}"></script>
 <!-- Django customisations -->
 <script src="{% static "jazzmin/js/main.js" %}"></script>
+<script>
+    $.ajaxSetup({
+        headers: {"X-CSRFToken": '{{ csrf_token }}' },
+    });
+</script>
 
 {% if jazzmin_settings.custom_js %}
 <script src="{% static jazzmin_settings.custom_js %}"></script>

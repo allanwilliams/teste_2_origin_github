@@ -275,6 +275,21 @@ class User(AbstractUser):
                 }
         return preferencias_obj
     
+    def get_user_credenciais(self):
+        credenciais_obj = {}
+        if self:
+            credenciais = CredenciaisUsuario.objects.filter(user=self)
+            sistemas = CredenciaisUsuario.SistemasCredenciais
+            
+
+            for sistema in sistemas:
+                credenciais_obj[sistema.name] = {
+                    'id': sistema.value,
+                    'label':sistema.label,
+                    'value':credenciais.filter(sistema=sistema).first() or False
+                }
+        return credenciais_obj
+    
 
 @receiver(post_save, sender=User)
 def create_app_user_str(sender, instance, created, **kwargs):
@@ -457,3 +472,24 @@ class TrocaSenhaUsuario(BaseModel):
                                 grava_senha.save()
             except Exception:
                 pass
+
+class CredenciaisUsuario(BaseModel):
+    class SistemasCredenciais(models.IntegerChoices):
+        PJE = 1, 'PJE'
+        ESAJ = 2, 'ESAJ'
+        SEEU = 3, 'SEEU'
+
+    user = models.ForeignKey(
+        'User',
+        on_delete=models.DO_NOTHING,
+        related_name='%(class)s_usuario',
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+
+    sistema = models.IntegerField('Sistema', choices=SistemasCredenciais.choices)
+
+    password = models.CharField('password', max_length=128)
+
+    usuario = models.CharField('password', max_length=128, null=True)

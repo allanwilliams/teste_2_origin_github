@@ -6,6 +6,12 @@
 <link rel="stylesheet" href="{% static 'admin/adminlte-dist/css/app.css' %}">
 <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
 <style>
+    .list-credencial-perfil {
+        height: 4.5em;
+        display: flex;
+        justify-content: space-between;
+    }
+
     .img-user {
         height: 120px;
         width: 120px;
@@ -28,6 +34,10 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
+    }
+
+    .errorlist {
+        color:red;
     }
 </style>
 
@@ -82,30 +92,29 @@
             <div class="col-md-8">  
                 <div class="box box-primary">
                     <div style="padding: 0 10px;height: 17em; display:flex; gap:1em;justify-content:center" class="box-body">
-                        {% if user.is_defensor %}
                         <div style="width: 100%;">
-                            <p style="font-size: 1.3em; font-weight:700;padding-top: 10px" class="box-title">Lotações</p>
+                            <p style="font-size: 1.3em; font-weight:700;padding-top: 10px" class="box-title">Credenciais</p>
                             <ul class="list-group list-group-unbordered">
-                                {% for lotacao in user.get_lotacoes_atuais %}
-                                    <li style="height: 4.5em;" class="list-group-item">
-                                        {{lotacao.titularidade_designacao.title}}: {{lotacao.defensoria.title}}
-                                    </li>
-                                {% endfor %}
-                                </ul>
-                        </div>
-                        {% endif %}
-                        {% if user.is_colaborador and user.get_lotacoes_triagem.count > 0 %}
-                        <div style="width: 100%;">
-                            <p style="font-size: 1.3em; font-weight:700;padding-top: 10px" class="box-title">Lotações</p>
-                            <ul class="list-group list-group-unbordered">
-                                {% for lotacao in user.get_lotacoes_triagem %}
-                                    <li style="height: 4.5em;" class="list-group-item">
-                                        {{lotacao.nucleo}}
+                                {% for key, credencial in request.user.get_user_credenciais.items %}
+                                    <li class="list-group-item list-credencial-perfil">
+                                        <div>
+                                            {{credencial.label}}
+                                        </div>
+                                        <div>
+                                            <a
+                                                class='btn btn-warning btn-credencial'
+                                                sistema-id="{{credencial.id}}"
+                                                sistema="{{credencial.label}}"
+                                                {% if credencial.value %} credencial-id="{{credencial.value.id}}" {% endif %}
+                                                {% if credencial.value %} credencial-username="{{credencial.value.usuario}}" {% endif %}
+                                            >
+                                                Cadastrar/Atualizar
+                                            </a>
+                                        </div>
                                     </li>
                                 {% endfor %}
                             </ul>
                         </div>
-                        {% endif %}
                         {% if user.groups.all %}
                             <div style="width: 100%;">
                                 <p style="font-size: 1.3em; font-weight:700;padding-top: 10px" class="box-title">Grupos</p>
@@ -147,7 +156,7 @@
 			<div class="modal-body">
                 <video  id="video"  width="566px"></video>
                 <canvas id='canvas' style="width:566px"></canvas>
-                <button class="btn btn-primary btn-block" id='capture'>Capturar Imagem</button>
+                <button class="btn btn-success btn-block" id='capture'>Capturar Imagem</button>
                 
                 <div id="loader" style="color:#000; display:none; text-align: center;">
                     <i id="loader" class="fa fa-spinner fa-spin fa-3x"></i> 
@@ -156,8 +165,55 @@
 
                 <div id="comandos-pos-captura" style="display: flex; align-items: flex-end;">                    
                     <button class="btn btn-danger btn-block" id="refazer">Refazer</button>
-                    <button class="btn btn-primary btn-block" id="upload" data-assistido-id="">Concluir</button>
+                    <button class="btn btn-success btn-block" id="upload" data-assistido-id="">Concluir</button>
                 </div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal credencial -->
+<div class="modal fade" id="modalCredencial" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="exampleModalLabel">
+                    Credencial <span id='label-sistema'></span>
+                </h4>
+			</div>
+			<div class="modal-body">
+                <form id='form-credencial'>
+                    <input type='hidden' name='sistema' id='sistema-id' />
+                    <input type='hidden' name='credencial' id='credencial-id' />
+                    <input type='hidden' name='user' value="{{request.user.id}}" />
+                    <div class="form-group">
+                        <label class="control-label text-right">Usuário</label>
+                        <div>
+                            <input required name='usuario' id='form-credencial-username' class='form-control' autocomplete="new-password" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label text-right">Senha</label>
+                        <div>
+                            <input required type='password' name='password' class='form-control' autocomplete="new-password" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label text-right">Confirmar Senha</label>
+                        <div>
+                            <input required type='password' name='confirmar_password' class='form-control' autocomplete="new-password" />
+                        </div>
+                    </div>
+                    <div id='error-form-credencial' class="form-group errorlist">
+                        
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">                    
+                        <button class="btn btn-success btn-block" >Salvar</button>
+                    </div>
+                </form>
 			</div>
 		</div>
 	</div>
@@ -339,5 +395,60 @@
         })
     }
 
+    $('.btn-credencial').on('click',function(){
+        const sistema = $(this).attr('sistema')
+        const sistemaId = $(this).attr('sistema-id')
+        const credencialId = $(this).attr('credencial-id')
+        const credencialUsername = $(this).attr('credencial-username')
+        $('#label-sistema').html(sistema)
+        $('#sistema-id').val(sistemaId)
+        $('#modalCredencial').modal('show')
+        if(credencialId){
+            $('#credencial-id').val(credencialId)
+        }else {
+            $('#credencial-id').val('')
+        } 
+        if(credencialId) {
+            $('#form-credencial-username').val(credencialUsername)
+        }else {
+            $('#form-credencial-username').val('')
+        }
+
+    })
+
+    const formCredencial = document.getElementById('form-credencial')
+    formCredencial.addEventListener('submit', submit)
+
+    function submit(e, vincula=false) {
+        e.preventDefault()
+        var formData = $(e.target).serializeArray();
+        const data = formData.reduce((obj, item) => Object.assign(obj, { [item.name]: item.value }), {});  
+        if (data.password != data.confirmar_password){
+            $('#error-form-credencial').html('Senhas diferentes')
+            return false
+        }
+        const url = data.credencial ? `/users/api/user-credenciais/${data.credencial}/` : '/users/api/user-credenciais/'
+        const method = data.credencial ? 'PUT' : 'POST'
+
+        $.ajax({
+            url: url,
+            type: method,
+            data: data,
+            success: (response) => {
+                $('#modalCredencial').modal('hide')
+                const msg = response.mensagem ? response.mensagem : 'Credencial salva com sucesso'
+                Swal.fire({
+                    title: msg,
+                    icon: 'success',
+                    confirmButtonColor: '#00a65a',
+                })
+            },
+            error: (error) => {
+                console.log(error)
+            }
+        })
+        
+        console.log(data)
+    }
 </script>
 {% endblock %}

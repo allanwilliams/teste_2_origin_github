@@ -268,7 +268,6 @@ function handlePreferencias() {
     }
     
     $('.check_preferencia').change((e) => {
-        console.log('aquiiii')
         const el = $(e.target)
         let checked = el.is(":checked")
         

@@ -217,6 +217,7 @@ ul.side-perfil {
     margin: 12px 7px 0 0;
     height: 37em;
     width: 26em !important;
+    border-top-width: 12px !important;
 }
 
 ul.side-perfil-colab {
