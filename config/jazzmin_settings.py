@@ -1,5 +1,6 @@
 
 JAZZMIN_SETTINGS = {
+     "related_modal_active": False,
     "custom_css": "css/custom_jazzmin/base_jazzmin.css",
 }
 

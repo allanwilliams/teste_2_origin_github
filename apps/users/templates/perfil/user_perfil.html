@@ -39,18 +39,21 @@
     .errorlist {
         color:red;
     }
+
+    .modal-header{
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .modal-header::before,.modal-header::after{
+        all: initial;
+    }
 </style>
 
 {% endblock %}
 
 {% block page_content %}
-<div id="preloader">
-    <div class="wrapper-loader">
-        <div class="spinner-loader"></div>
-        <span>Aguarde...</span>
-    </div>
-</div>
-<section class="content-header">
+<section style='padding-top:30px' class="content-header">
     <h1>Perfil do Usuário</h1>
 </section>
 
@@ -146,14 +149,14 @@
 <!-- Modal -->
 <div class="modal fade" id="modalWebcam" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
-		<div class="modal-content">
+		<div style="width:600px" class="modal-content">
 			<div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
                 <h4 class="modal-title" id="exampleModalLabel">
                     Imagem - Webcam
                 </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
 			</div>
 			<div class="modal-body">
                 <video  id="video"  width="566px"></video>
@@ -179,12 +182,12 @@
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
                 <h4 class="modal-title" id="exampleModalLabel">
                     Credencial <span id='label-sistema'></span>
                 </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
 			</div>
 			<div class="modal-body">
                 <form id='form-credencial'>
@@ -449,8 +452,6 @@
                 console.log(error)
             }
         })
-        
-        console.log(data)
     }
 </script>
 {% endblock %}

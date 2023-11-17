@@ -143,9 +143,7 @@
                                         value="{{ language.code }}"
                                         class="dropdown-item {% if language.code == LANGUAGE_CODE %}active{% endif %}"
                                         lang="{{ language.code }}"
-                                    >$.ajaxSetup({
-                                        headers: {"X-CSRFToken": '{{ csrf_token }}' },
-                                    });
+                                    >
                                 {% endfor %}
                             </form>
                         </div>
@@ -325,6 +323,8 @@
 <script src="{% static "vendor/adminlte/js/adminlte.min.js" %}"></script>
 <!-- Django customisations -->
 <script src="{% static "jazzmin/js/main.js" %}"></script>
+<script src="{% static 'tinymce_v5/tinymce.min.js' %}" ></script>
+<script src="{% static 'sweetalert2_v11/sweetalert2.all.min.js' %}" ></script>
 <script>
     $.ajaxSetup({
         headers: {"X-CSRFToken": '{{ csrf_token }}' },

@@ -866,7 +866,7 @@ iframe.related-iframe {
     height: 450px;
 }
 
-/* Blur background when using modal */
+/* Blur background when using modal 
 .modal-open .wrapper {
     -webkit-filter: blur(1px);
     -moz-filter: blur(1px);
@@ -874,6 +874,7 @@ iframe.related-iframe {
     -ms-filter: blur(1px);
     filter: blur(1px);
 }
+*/
 /* end modal tweaks */
 
 .control-sidebar {
