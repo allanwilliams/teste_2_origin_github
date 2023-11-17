@@ -203,13 +203,13 @@
                     <div class="form-group">
                         <label class="control-label text-right">Senha</label>
                         <div>
-                            <input required type='password' name='password' class='form-control' autocomplete="new-password" />
+                            <input required type='password' name='password' id='form-credencial-password' class='form-control' autocomplete="new-password" />
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label text-right">Confirmar Senha</label>
                         <div>
-                            <input required type='password' name='confirmar_password' class='form-control' autocomplete="new-password" />
+                            <input required type='password' name='confirmar_password' id='form-credencial-confirmar-password' class='form-control' autocomplete="new-password" />
                         </div>
                     </div>
                     <div id='error-form-credencial' class="form-group errorlist">
@@ -408,17 +408,15 @@
         $('#label-sistema').html(sistema)
         $('#sistema-id').val(sistemaId)
         $('#modalCredencial').modal('show')
+        $('#form-credencial-password').val('')
+        $('#form-credencial-confirmar-password').val('')
         if(credencialId){
             $('#credencial-id').val(credencialId)
-        }else {
-            $('#credencial-id').val('')
-        } 
-        if(credencialId) {
             $('#form-credencial-username').val(credencialUsername)
         }else {
+            $('#credencial-id').val('')
             $('#form-credencial-username').val('')
-        }
-
+        } 
     })
 
     const formCredencial = document.getElementById('form-credencial')
