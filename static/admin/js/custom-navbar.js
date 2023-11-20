@@ -1,6 +1,10 @@
 const userId = $('#input-navbar-user-id').val()
 
 $(function() {
+    $(document).on('click', '.notifications-menu .dropdown-menu', function (e) {
+        e.stopPropagation();
+    });
+    
     obterLembretesRecebidos();
     obterLembretesEnviados();
     handlePreferencias()
