@@ -368,3 +368,7 @@ form .box-body {
         min-width: 500px;
     }
 }
+
+.msg-aviso {
+    color: #000;
+}
