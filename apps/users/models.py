@@ -8,11 +8,17 @@ from django.conf import settings
 from django_currentuser.middleware import get_current_authenticated_user
 from django.utils import timezone
 from django.core import serializers
+from django.contrib.auth.models import Group
 from apps.users.choices import  CHOICES_SEXO_USER
 from apps.core.mixins import BaseModel
 from apps.core.utils import core_encrypt,core_decrypt
 import json
 import requests
+
+Group.cols = {
+    'name': 12,
+    'permissions':12
+}
 
 class User(AbstractUser):
     PAPEL_DEFENSOR = 1
@@ -27,7 +33,12 @@ class User(AbstractUser):
         'password':4,
         'cpf': 3,
         'first_name': 3,
-        'last_name': 3
+        'last_name': 3,
+        'is_active': 4,
+        'is_staff': 4,
+        'is_superuser': 4,
+        'groups': 12,
+        'user_permissions': 12,
     }
   
     name = CharField(_("Nome Completo"), blank=True, max_length=255)

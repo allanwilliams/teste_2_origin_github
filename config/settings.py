@@ -237,18 +237,39 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/3.2/topics/i18n/
-
-LANGUAGE_CODE = 'pt-br'
-
-TIME_ZONE = 'America/Fortaleza'
-
+# Local time zone. Choices are
+# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+# though not all of them may be available with every OS.
+# In Windows, this must be set to your system time zone.
+TIME_ZONE = "America/Fortaleza"
+# https://docs.djangoproject.com/en/dev/ref/settings/#language-code
+LANGUAGE_CODE = "pt-BR"
+# https://docs.djangoproject.com/en/dev/ref/settings/#site-id
+SITE_ID = 1
+# https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
 USE_I18N = True
+# https://docs.djangoproject.com/en/dev/ref/settings/#use-l10n
+USE_L10N = False
+# https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
+USE_TZ = False
+# https://docs.djangoproject.com/en/dev/ref/settings/#locale-paths
+LOCALE_PATHS = [ROOT_DIR.path("locale")]
+# https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-USE_THOUSAND_SEPARATOR
+USE_THOUSAND_SEPARATOR = True
+# https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-THOUSAND_SEPARATOR
+THOUSAND_SEPARATOR = '.'
+NUMBER_GROUPING = 3
 
-USE_L10N = True
+#DATA_UPLOAD_MAX_NUMBER_FIELDS
+DATA_UPLOAD_MAX_NUMBER_FIELDS=None
+DATA_UPLOAD_MAX_MEMORY_SIZE = 100000000
 
-USE_TZ = True
+# Format Date
+DATE_INPUT_FORMATS = ['%d/%m/%Y']
+DATETIME_INPUT_FORMATS = ['%d/%m/%Y %G:%i:%s']
+
+DATE_FORMAT = 'd/m/Y'
+DATETIME_FORMAT = 'd/m/Y G:i:s'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
