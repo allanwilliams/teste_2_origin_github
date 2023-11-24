@@ -1,0 +1,70 @@
+{% extends 'contabilidade/base.html' %}
+
+{% block css_specific %}
+<style>
+.container {
+    width: 800px; !important
+}
+</style>
+{% endblock css_specific %}
+
+{% block title %}
+<h5 class="text-center">Requisição de Calculo do ICMS</h5>
+{% endblock title %}
+
+{% block content %}
+    <div class="card-box">
+        <div class="row">
+            <div class="col">
+                <form method="post" action="{% url 'contabilidade:solicitar' %}" autocomplete="off" enctype="multipart/form-data" target="_blank">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label>{{ form.assistido_cpf.label }} <span class="text-danger">*</span></label>
+                                <div class="input-group" style="display: block;">{{ form.assistido_cpf }}</div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label>{{ form.assistido_nome.label }} <span class="text-danger">*</span></label>
+                                <div class="input-group" style="display: block;">{{ form.assistido_nome }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label>{{ form.assistido_preferencia.label }} <span class="text-danger">*</span></label>
+                                <div class="input-group" style="display: block;">{{ form.assistido_preferencia }}</div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label>{{ form.assistido_email.label }} <span class="text-danger">*</span></label>
+                                <div class="input-group" style="display: block;">{{ form.assistido_email }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label>{{ form.assistido_ddd.label }} <span class="text-danger">*</span></label>
+                                <div class="input-group" style="display: block;">{{ form.assistido_ddd }}</div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label>{{ form.assistido_telefone.label }} <span class="text-danger">*</span></label>
+                                <div class="input-group" style="display: block;">{{ form.assistido_telefone }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-dpge-success">Calcular</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

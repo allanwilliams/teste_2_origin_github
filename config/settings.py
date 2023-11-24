@@ -20,7 +20,7 @@ import platform
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ROOT_DIR = (environ.Path(__file__) - 1)
+ROOT_DIR = (environ.Path(__file__) - 2)
 APPS_DIR = ROOT_DIR.path("apps")
 
 env = environ.Env(
@@ -99,7 +99,7 @@ AUTH_USER_MODEL = "users.User"
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(APPS_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -253,7 +253,7 @@ USE_L10N = False
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
 USE_TZ = False
 # https://docs.djangoproject.com/en/dev/ref/settings/#locale-paths
-LOCALE_PATHS = [ROOT_DIR.path("locale")]
+
 # https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-USE_THOUSAND_SEPARATOR
 USE_THOUSAND_SEPARATOR = True
 # https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-THOUSAND_SEPARATOR

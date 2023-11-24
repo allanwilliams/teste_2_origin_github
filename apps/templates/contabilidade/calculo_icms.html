@@ -1,0 +1,69 @@
+{% load static %}
+{% load presenters_tags %}
+
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<table class="top-report">
+    <tr>
+        <td class="alncenter"><img style="width: 300px;" src="{% static 'dpge.png' %}"></td>
+    </tr>
+    <tr><td class="alncenter"><h3>TABELA DE CÁLCULO DO VALOR <br/>DO ICMS SOBRE TUST E TUSD</h3></td></tr>
+</table>
+
+<p class="alnright">Fortaleza(CE), {{hoje}}</p>
+
+<table class="bordasimples">
+    <tr>
+        <td colspan="3">Nome do Cliente:<br><strong>{{object.cliente_nome}}</strong></td>
+        <td colspan="3">CPF:<br><strong>{{object.cliente_cpf|presenter_cpf}}</strong></td>
+    </tr>
+    <tr>
+        <td colspan="2">Número do Cliente:<br><strong>{{object.cliente_numero}} - {{object.cliente_numero_dv}}</strong></td>
+        <td colspan="2">Índices:<br><strong>{{object.indices}}</strong></td>
+        <td colspan="2">Endereço do Cliente:<br><strong>{{object.cliente_endereco}}</strong></td>
+    </tr>
+</table>
+<br>
+<br>
+<!--NO-PRINT-->
+    <table class="bordasimples">
+        <tr>
+            <td width="90px" class="alncenter" style="background-color:#DDDDDD;">Competência</td>
+            <td width="90px" class="alncenter" style="background-color:#DDDDDD;">Transmissão</td>
+            <td width="90px" class="alncenter" style="background-color:#DDDDDD;">ICMS da Transmissão</td>
+            <td width="90px" class="alncenter" style="background-color:#DDDDDD;">Distribuição</td>
+            <td width="90px" class="alncenter" style="background-color:#DDDDDD;">ICMS da Distribuição</td>
+            <td width="90px" class="alncenter" style="background-color:#DDDDDD;">ICMS Total</td>
+            <td width="90px" class="alncenter" style="background-color:#DDDDDD;">INPC Acumulado</td>
+            <td width="90px" class="alncenter" style="background-color:#DDDDDD;">Valor Corrigido</td>
+            <td width="90px" class="alncenter" style="background-color:#DDDDDD;">Meses Corrigidos</td>
+            <td width="90px" class="alncenter" style="background-color:#DDDDDD;">Juros Mora</td>
+        </tr>
+        {% for a in extrato %}
+            <tr>
+                <td class="alnright">{{a.referencia}}</td>
+                <td class="alnright">{{a.valor_transmissao}}</td>
+                <td class="alnright">{% if a.valor_transmissao_icms %}{{a.valor_transmissao_icms}}{% else %}-{% endif %}</td>
+                <td class="alnright">{% if a.valor_distribuicao %}{{a.valor_distribuicao}}{% else %}-{% endif %}</td>
+                <td class="alnright">{% if a.valor_distribuicao_icms %}{{a.valor_distribuicao_icms}}{% else %}-{% endif %}</td>
+                <td class="alnright">{% if a.valor_restituicao_icms %}{{a.valor_restituicao_icms}}{% else %}-{% endif %}</td>
+                <td class="alnright">{% if a.indice_atualizacao_monetaria %}{{a.indice_atualizacao_monetaria}}%{% else %}-{% endif %}</td>
+                <td class="alnright">{% if a.valor_restituicao_icms_corrigido %}{{a.valor_restituicao_icms_corrigido}}{% else %}-{% endif %}</td>
+                <td class="alnright">{% if a.quant_meses_correcao %}{{a.quant_meses_correcao}}{% else %}-{% endif %}</td>
+                <td class="alnright">{% if a.valor_juros %}{{a.valor_juros}}{% else %}-{% endif %}</td>
+            </tr>
+        {% endfor %}
+            <tr>
+                <td colspan="7"></td>
+                <td class="alnright"><strong>R$ {{object.valor_total_corrigido}}</strong></td>
+                <td></td>
+                <td class="alnright"><strong>R$ {{object.valor_juros}}</strong></td>
+            </tr>
+            <tr>
+                <td class="alnright" colspan="7"><strong>VALOR TOTAL:</strong></td>
+                <td class="alnright" colspan="3"><strong>R$ {{object.valor_total_juros}}</strong></td>
+            </tr>
+    </table>
+</body>
