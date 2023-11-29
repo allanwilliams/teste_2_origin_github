@@ -103,7 +103,7 @@
                                     <li class="list-group-item list-credencial-perfil">
                                         <div>
                                             {% with 'imagens/'|add:credencial.label|add:'.png' as image_static %}
-                                                <img width="50px" src='{% static image_static %}' />
+                                                <img alt="" width="50px" src='{% static image_static %}' />
                                             {% endwith %}
                                         </div>
                                         <div>
@@ -186,7 +186,7 @@
 			<div class="modal-header">
                 <h4 class="modal-title" id="exampleModalLabel">
                     Credencial <span id='label-sistema'>
-                        <img width="50px" id='img-credencial' src="" />
+                        <img alt="" width="50px" id='img-credencial' src="" />
                     </span>
                 </h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
