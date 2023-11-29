@@ -102,7 +102,9 @@
                                 {% for key, credencial in request.user.get_user_credenciais.items %}
                                     <li class="list-group-item list-credencial-perfil">
                                         <div>
-                                            {{credencial.label}}
+                                            {% with 'imagens/'|add:credencial.label|add:'.png' as image_static %}
+                                                <img width="50px" src='{% static image_static %}' />
+                                            {% endwith %}
                                         </div>
                                         <div>
                                             <a
@@ -183,7 +185,9 @@
 		<div class="modal-content">
 			<div class="modal-header">
                 <h4 class="modal-title" id="exampleModalLabel">
-                    Credencial <span id='label-sistema'></span>
+                    Credencial <span id='label-sistema'>
+                        <img width="50px" id='img-credencial' src="" />
+                    </span>
                 </h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
@@ -405,7 +409,7 @@
         const sistemaId = $(this).attr('sistema-id')
         const credencialId = $(this).attr('credencial-id')
         const credencialUsername = $(this).attr('credencial-username')
-        $('#label-sistema').html(sistema)
+        $('#img-credencial').attr('src',`/staticfiles/imagens/${sistema}.png`)
         $('#sistema-id').val(sistemaId)
         $('#modalCredencial').modal('show')
         $('#form-credencial-password').val('')
