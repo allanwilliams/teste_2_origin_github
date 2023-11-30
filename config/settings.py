@@ -274,9 +274,9 @@ DATETIME_FORMAT = 'd/m/Y G:i:s'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATICFILES_DIRS = ( env('STATIC_URL', default=os.path.join(BASE_DIR, 'staticfiles')), )
+STATICFILES_DIRS = [ os.path.join(BASE_DIR, 'staticfiles') ]
 STATIC_URL = env('STATIC_URL', default='/static/')
-STATIC_ROOT = os.path.join('static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
 # Media

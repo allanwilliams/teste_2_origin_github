@@ -94,3 +94,5 @@ staticfiles/
 tests/
 
 .scannerwork
+
+uwsgi.ini
