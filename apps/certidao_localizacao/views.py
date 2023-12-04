@@ -6,9 +6,9 @@ from django.conf import settings
 from django.views.decorators.http import require_http_methods
 from apps.certidao_localizacao.helpers import get_hash
 from apps.users.models import Defensores
-from apps.contrib.models import Estados
+from apps.contrib.models import Estados, AssinaturaDocumento
 from apps.core.encrypt_url_utils import decrypt
-from .models import Certidao,CertidaoAssinatura
+from .models import Certidao
 from .helpers import url_img_token,url_verificador,url_img_mobile
 from geopy.geocoders import Nominatim
 
@@ -19,17 +19,17 @@ def render_pdf(request): # pragma: no cover
         id_certidao = request.GET.get('pk')
         id_certidao = decrypt(id_certidao)
         certidao = Certidao.objects.filter(id=id_certidao).first()
-        assinatura = CertidaoAssinatura.objects.filter(certidao=certidao).first()
-        if assinatura:
+
+        if certidao.assinatura:
             context = {
                 'ip': certidao.ip,
                 'municipio': certidao.municipio,
                 'usuario': certidao.criado_por.name if certidao.criado_por else '',
                 'matricula': certidao.criado_por.matricula,
                 'data_hora': certidao.data_hora,
-                'assinatura': assinatura,
+                'assinatura': certidao.assinatura,
                 'certidao': certidao,
-                'url_img_token': url_img_token(assinatura.token),
+                'url_img_token': url_img_token(certidao.assinatura.token),
                 'url_verificador': url_verificador()
             }
             
@@ -73,6 +73,14 @@ def assinar_salvar(request):
         autenticado = usuario_logado.check_password(senha)
 
     if autenticado:
+        token_validador = get_hash()
+        dic_assinatura = {
+            'token': token_validador,
+            'criado_em': datetime.now()
+        }
+        assinatura = AssinaturaDocumento(**dic_assinatura)
+        assinatura.save()
+
         geolocator = Nominatim(user_agent="certidao_localizacao")
         location = geolocator.reverse(lat+","+long)
         
@@ -89,16 +97,8 @@ def assinar_salvar(request):
         if municipio == '':
             municipio = address.get('town','')  
         certidao.municipio = municipio
-        certidao.assinatura = True
+        certidao.assinatura = assinatura
         certidao.save()
-        token_validador = get_hash()
-        dic_assinatura = {
-            'token': token_validador,
-            'certidao': certidao,
-            'criado_em': datetime.now()
-        }
-        assinatura = CertidaoAssinatura(**dic_assinatura)
-        assinatura.save()
 
         return render(request,'assinatura_mobile.html',context={'sucesso':True, 'certidao_id': certidao_enc})
     else:
@@ -111,7 +111,7 @@ def verificar_assinatura(request):
         token_url = request.GET.get('token')
         if token_url:
             template = 'validar_assinatura_qrcode.html'
-            assinatura = CertidaoAssinatura.objects.filter(token=token_url).first()
+            assinatura = AssinaturaDocumento.objects.filter(token=token_url).first()
 
             doc_valido = True if assinatura else False
 
@@ -126,7 +126,7 @@ def verificar_assinatura(request):
 
     if request.method == 'POST':
         token_input = request.POST.get('token')
-        assinatura = CertidaoAssinatura.objects.filter(token=token_input).first()
+        assinatura = AssinaturaDocumento.objects.filter(token=token_input).first()
         template = 'validar_assinatura.html'
         
         doc_valido = True if assinatura else False

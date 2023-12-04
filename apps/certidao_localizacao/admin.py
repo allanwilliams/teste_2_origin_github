@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Certidao, CertidaoAssinatura
+from .models import Certidao
 from apps.core.mixins import AuditoriaAdmin
 from django_currentuser.middleware import get_current_user
 from .helpers import url_img_mobile

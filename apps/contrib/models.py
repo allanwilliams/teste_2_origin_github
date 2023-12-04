@@ -90,3 +90,12 @@ class Escolaridades(BaseModel):
         verbose_name = 'Escolaridade'
         verbose_name_plural = 'Escolaridades'
         ordering = ['id']
+
+class AssinaturaDocumento(BaseModel):
+    token = models.CharField('Token validador', null=True, blank=True, max_length=16)
+    
+    def __str__(self):
+        return self.token
+    class Meta:
+        verbose_name = 'Certidão Assinatura'
+        verbose_name_plural = 'Certidões Assinatura'
