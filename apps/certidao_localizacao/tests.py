@@ -59,7 +59,6 @@ class CertidaoTest(TestCase):
         certidao = Certidao(
             municipio="Fortaleza",
             data_hora=timezone.now(),
-            assinatura=False,
             criado_por=self.user
         )
         certidao.save()
@@ -77,7 +76,6 @@ class CertidaoTest(TestCase):
         certidao = Certidao(
             municipio="Fortaleza",
             data_hora=timezone.now(),
-            assinatura=False,
             criado_por=self.user
         )
         certidao.save()
@@ -144,7 +142,6 @@ class CertidaoTest(TestCase):
         certidao = Certidao(
             municipio="Fortaleza",
             data_hora=timezone.now(),
-            assinatura=False,
             criado_por=self.user
         )
         certidao.save()
@@ -179,7 +176,6 @@ class CertidaoTest(TestCase):
         certidao = Certidao(
             municipio="Fortaleza",
             data_hora=timezone.now(),
-            assinatura=False,
             criado_por=self.user
         )
         certidao.save()
@@ -191,7 +187,6 @@ class CertidaoTest(TestCase):
         certidao = Certidao(
             municipio="Fortaleza",
             data_hora=timezone.now(),
-            assinatura=False,
             criado_por=self.user
         )
         certidao.save()
