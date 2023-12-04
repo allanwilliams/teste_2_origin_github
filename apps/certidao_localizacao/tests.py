@@ -2,9 +2,9 @@ from django.test import TestCase, Client
 from django.conf import settings
 from django.utils import timezone
 from apps.users.models import User
-from apps.certidao_localizacao.models import Certidao, CertidaoAssinatura
+from apps.certidao_localizacao.models import Certidao
 from apps.certidao_localizacao.helpers import get_hash
-from apps.contrib.models import Estados
+from apps.contrib.models import Estados, AssinaturaDocumento
 from apps.core.encrypt_url_utils import encrypt
 
 username = 'teste.user'
@@ -29,30 +29,20 @@ class CertidaoTest(TestCase):
         self.client.force_login(user=user)        
 
     def test_assinatura_str(self):
-        certidao = Certidao(
-            municipio="Fortaleza",
-            data_hora=timezone.now(),
-            assinatura=True,
-            criado_por=self.user
-        )
-        certidao.save()
-        
         token_validador = get_hash()
         dic_assinatura = {
             'token': token_validador,
-            'certidao': certidao,
             'criado_em': timezone.now()
         }
-        assinatura = CertidaoAssinatura(**dic_assinatura)
+        assinatura = AssinaturaDocumento(**dic_assinatura)
         assinatura.save()
-
+        
         self.assertTrue(token_validador in str(assinatura))
         
     def test_assinar(self):
         certidao = Certidao(
             municipio="Fortaleza",
             data_hora=timezone.now(),
-            assinatura=False,
             criado_por=self.user
         )
         certidao.save()
@@ -100,22 +90,21 @@ class CertidaoTest(TestCase):
         self.assertEqual(response.url, f'/certidao_localizacao/assinar-certidao?certidao={hash_id}')
     
     def test_verificar_assinatura_get(self):
-        certidao = Certidao(
-            municipio="Fortaleza",
-            data_hora=timezone.now(),
-            assinatura=True,
-            criado_por=self.user
-        )
-        certidao.save()
-        
         token_validador = get_hash()
         dic_assinatura = {
             'token': token_validador,
-            'certidao': certidao,
             'criado_em': timezone.now()
         }
-        assinatura = CertidaoAssinatura(**dic_assinatura)
+        assinatura = AssinaturaDocumento(**dic_assinatura)
         assinatura.save()
+        
+        certidao = Certidao(
+            municipio="Fortaleza",
+            data_hora=timezone.now(),
+            assinatura=assinatura,
+            criado_por=self.user
+        )
+        certidao.save()
 
         response = self.client.get(verificar_assinatura_url, {'token': token_validador},HTTP_USER_AGENT=user_agent)
         self.assertEqual(response.status_code, 200)
@@ -124,7 +113,6 @@ class CertidaoTest(TestCase):
         certidao = Certidao(
             municipio="Fortaleza",
             data_hora=timezone.now(),
-            assinatura=False,
             criado_por=self.user
         )
         certidao.save()
@@ -133,23 +121,22 @@ class CertidaoTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_verificar_assinatura_post(self):
+        token_validador = get_hash()
+        dic_assinatura = {
+            'token': token_validador,
+            'criado_em': timezone.now()
+        }
+        assinatura = AssinaturaDocumento(**dic_assinatura)
+        assinatura.save()
+
         certidao = Certidao(
             municipio="Fortaleza",
             data_hora=timezone.now(),
-            assinatura=True,
+            assinatura=assinatura,
             criado_por=self.user
         )
         certidao.save()
         
-        token_validador = get_hash()
-        dic_assinatura = {
-            'token': token_validador,
-            'certidao': certidao,
-            'criado_em': timezone.now()
-        }
-        assinatura = CertidaoAssinatura(**dic_assinatura)
-        assinatura.save()
-
         response = self.client.post(verificar_assinatura_url, {'token': token_validador},HTTP_USER_AGENT=user_agent)
         self.assertEqual(response.status_code, 200)
 
@@ -168,22 +155,22 @@ class CertidaoTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_assinar_certidao_assinada(self):
+        token_validador = get_hash()
+        dic_assinatura = {
+            'token': token_validador,
+            'criado_em': timezone.now()
+        }
+        assinatura = AssinaturaDocumento(**dic_assinatura)
+        assinatura.save()
+
         certidao = Certidao(
             municipio="Fortaleza",
             data_hora=timezone.now(),
-            assinatura=True,
+            assinatura=assinatura,
             criado_por=self.user
         )
         certidao.save()
         
-        token_validador = get_hash()
-        dic_assinatura = {
-            'token': token_validador,
-            'certidao': certidao,
-            'criado_em': timezone.now()
-        }
-        assinatura = CertidaoAssinatura(**dic_assinatura)
-        assinatura.save()
 
         response = self.client.get('/certidao_localizacao/assinar-certidao', {'certidao': encrypt(certidao.id)},HTTP_USER_AGENT=user_agent)
         self.assertEqual(response.status_code, 200)
