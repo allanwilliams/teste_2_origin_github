@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils import timezone
 from apps.users.models import User
 from apps.certidao_localizacao.models import Certidao
-from apps.certidao_localizacao.helpers import get_hash
+from apps.contrib.helpers import get_hash
 from apps.contrib.models import Estados, AssinaturaDocumento
 from apps.core.encrypt_url_utils import encrypt
 
