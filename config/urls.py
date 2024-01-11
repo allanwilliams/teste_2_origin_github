@@ -60,7 +60,7 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('django_sso_app/', include('apps.django_sso_app.urls')),
     path('core/', include('apps.core.urls')),
-    path('contrib/', include('apps.contrib.urls')),
+    path("contrib/", include("apps.contrib.urls", namespace="contrib")),
     path('oidc/', include('mozilla_django_oidc.urls')),
     path("users/", include("apps.users.urls", namespace="users")),
     path('ajax_select/', include(ajax_select_urls)),
