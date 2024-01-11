@@ -49,8 +49,8 @@ class CertidaoTest(TestCase):
         data = {
             'usuario_senha': settings.USER_PASSWORD_TEST,
             'certidao': encrypt(certidao.id),
-            'lat': 0,
-            'long': 0
+            'lat': 52.509669,
+            'long': 13.376294
         }
         response = self.client.post(assinar_salvar_url, data,HTTP_USER_AGENT=user_agent)
         self.assertEqual(response.status_code, 200)

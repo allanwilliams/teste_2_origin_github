@@ -4,12 +4,10 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
-from apps.certidao_localizacao.helpers import get_hash
-from apps.users.models import Defensores
+from apps.contrib.helpers import get_hash, url_img_token, url_verificador
 from apps.contrib.models import Estados, AssinaturaDocumento
 from apps.core.encrypt_url_utils import decrypt
-from .models import Certidao
-from .helpers import url_img_token,url_verificador,url_img_mobile
+from apps.certidao_localizacao.models import Certidao
 from geopy.geocoders import Nominatim
 
 @require_http_methods(["GET"])
@@ -74,16 +72,17 @@ def assinar_salvar(request):
 
     if autenticado:
         token_validador = get_hash()
+        data_hora = datetime.now()
         dic_assinatura = {
             'token': token_validador,
-            'criado_em': datetime.now()
+            'criado_em': data_hora,
+            'criado_por': usuario_logado
         }
         assinatura = AssinaturaDocumento(**dic_assinatura)
         assinatura.save()
 
-        geolocator = Nominatim(user_agent="certidao_localizacao")
-        location = geolocator.reverse(lat+","+long)
-        
+        geolocator = Nominatim(user_agent="defensoria_publica_estado_ceara")
+        location = geolocator.reverse(f"{lat}, {long}")
         address = location.raw['address']
         estado_nome = address.get('state','Ceará')
         estado = Estados.objects.filter(nome=estado_nome).first()
@@ -92,7 +91,7 @@ def assinar_salvar(request):
         certidao.estado = estado
         certidao.latitude = lat
         certidao.longitude = long
-        certidao.data_hora = datetime.now()
+        certidao.data_hora = data_hora
         municipio = address.get('city','')  
         if municipio == '':
             municipio = address.get('town','')  

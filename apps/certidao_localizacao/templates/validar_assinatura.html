@@ -5,7 +5,7 @@
 <div id="wrapper-form">
   <div class="container">
     <h4><strong>Validar Assinatura</strong></h4> 
-    <form action="/certidao_localizacao/verificar-assinatura" method="POST" autocomplete="off" id="form-token" class="form-inline">
+    <form action="/contrib/verificar-assinatura" method="POST" autocomplete="off" id="form-token" class="form-inline">
       {% csrf_token %}
       <div class="form-core">
         <div class="form-group">
@@ -26,12 +26,7 @@
       <div class="alert alert-success" role="alert">
         <span>Código verificador válido</span>
       </div>
-      <object data="/certidao_localizacao/render-pdf?pk={{ assinatura.certidao.get_encrypt_id}}"
-              type="application/pdf"
-              width="100%"
-              height="800px">
-      </object>
-      <p>Documento assinado por: <strong>{{assinatura.certidao.criado_por.name}}</strong> em <strong>{{assinatura.criado_em}}</strong></p>
+      <p>Documento assinado por: <strong>{{assinatura.criado_por}}</strong> em <strong>{{assinatura.criado_em}}</strong></p>
     </div>
     {% endif %}
   </div>

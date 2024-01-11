@@ -20,10 +20,7 @@
             {% autoescape off %}
                <p>
                   <strong>CERTIFICO</strong> para os fins de direito, que às <strong>{{ data_hora|date:"H:i:s" }}</strong> do dia <strong>{{ data_hora|date:"d/m/Y" }}</strong>
-                  o(a) Defensor(a) Público(a) Estadual <strong>{{ usuario }}</strong>, matrícula nº <strong>{{ matricula }}</strong> registrou presença no órgão da Defensoria Pública do Estado do Ceará situado na Cidade de <strong>{{ municipio }}</strong> nas coordenadas geográficas (Latitude: {{certidao.latitude}}, Longitude: {{certidao.longitude}}) através do Sistema Nossa Defensoria (IP nº {{ ip }}).
-               </p>
-               <p>
-                  A presente certidão deve ser encaminhada à CDC/CDI como comprovação de deslocamento para exercício de atividade cumulativa/extraordinária, bem como comparecimento ao plantão defensorial.
+                  <strong>{{ usuario }}</strong>, matrícula nº <strong>{{ matricula }}</strong> registrou presença no órgão da Defensoria Pública do Estado do Ceará situado na Cidade de <strong>{{ municipio }}</strong> nas coordenadas geográficas (Latitude: {{certidao.latitude}}, Longitude: {{certidao.longitude}}) através do Sistema Nossa Defensoria (IP nº {{ ip }}).
                </p>
             {% endautoescape %}
          </div>

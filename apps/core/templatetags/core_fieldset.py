@@ -25,3 +25,17 @@ def encfile(src): # pragma: no cover
 @register.filter
 def dd(src): # pragma: no cover
     return dir(src)
+
+@register.filter(name='get_nested_attr')
+def get_nested_attr(obj, key):
+    keys = key.split('.')
+    try:
+        for k in keys:
+            obj = obj[k]
+        return obj
+    except (TypeError, KeyError):
+        return None
+    
+@register.filter
+def get_field_from_instance(obj,field):
+    return getattr(obj,field)

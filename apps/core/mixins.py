@@ -1,22 +1,25 @@
+from django import forms
 from django.conf import settings
-from django.contrib import admin
-from django.contrib.admin.views.main import ChangeList
+from django.contrib import admin, messages
 from django.contrib.admin import SimpleListFilter
+from django.contrib.auth.decorators import login_required, permission_required
 from django.db import models
-from django.forms import Select, Textarea, TextInput
+from django.forms import Textarea
 from django.utils import timezone
+from django.shortcuts import render, redirect
+from django_currentuser.middleware import get_current_user, get_current_authenticated_user
+from django.http import HttpResponse,HttpResponseRedirect
+from django.urls import reverse, path
+from reversion.admin import VersionAdmin
+from apps.core.encrypt_url_utils import encrypt
+from apps.core.utils import core_decrypt, core_encrypt,format
+from apps.core.permission_functions import permission_required_for_model_view,permission_required_for_user_view
+from reversion import register
+from reversion.revisions import is_active, set_comment
+import reversion
 import json
 import decimal
 import inspect
-
-from django_currentuser.middleware import get_current_user, get_current_authenticated_user
-from reversion.admin import VersionAdmin
-from reversion.revisions import is_active, set_comment
-from django.contrib.admin.options import ModelAdmin as MA
-from apps.core.encrypt_url_utils import encrypt
-from apps.core.utils import core_decrypt, core_encrypt,format
-from reversion import register
-import reversion
 
 LIST_PER_PAGE = 10
 
@@ -216,3 +219,146 @@ def compact(*names):
             result[n] = caller.f_globals[n]
     return result
 
+class GenericCrud:
+    def __init__(self,namespace, model, label, parent_column, list_fields, form_fields, view_fields):
+        self.namespace = namespace
+        self.model = model
+        self.label = label
+        self.list_fields = list_fields
+        self.form_fields = form_fields
+        self.view_fields = view_fields
+        self.parent_column = parent_column
+        self.form = self.get_form()
+
+        self.CRIADO_SUCESSO = f'{self.label} criada com sucesso!'
+        self.ERRO_INTERNO = f'Erro interno ao criar {self.label}!'
+        self.EDITADO_SUCESSO = f'{self.label} editada com sucesso!'
+        self.ERRO_EDITAR = f'Erro ao editar {self.label}!'
+        self.VINCULO_INEXISTENTE = "Usuário sem vinculo contratual!"
+    
+    def visualizar(self,request, pk, parent_id=None):
+        if pk:
+            instance_object = self.model.objects.filter(pk=pk).first()
+            
+        context = {
+            'instance_object': instance_object,
+            'crud': self
+        }
+        
+        if parent_id:
+            context['parent_id'] = parent_id
+
+        return render(request, 'generic_crud/visualizar.html', context)
+    
+    def criar(self,request,parent_id=None):
+        form = self.form
+
+        if request.method == 'POST':
+            form = self.form(request.POST, request.FILES)
+            
+            if form.is_valid():
+                try:
+                    instance_object = form.save()
+                    if request.is_ajax(): # pragma: no cover
+                        return HttpResponse(json.dumps({'mensagem': self.CRIADO_SUCESSO}), status=200, content_type="application/json")
+                except Exception: # pragma: no cover
+                    return HttpResponse(json.dumps({'mensagem': self.ERRO_INTERNO}), status=500, content_type="application/json")
+                
+                messages.success(request, self.CRIADO_SUCESSO)
+                return redirect(f'/{self.model._meta.app_label}/{self.namespace}-visualizar/{instance_object.id}')
+            else:
+                if request.is_ajax(): # pragma: no cover
+                    errors = dict(form.errors.items())
+                    return HttpResponse(json.dumps(errors), status=400, content_type="application/json")
+        
+        context = {
+            'form': form,
+            'parent_id': parent_id,
+            'crud': self
+        }
+
+        if parent_id:
+            context['parent_id'] = parent_id
+
+        return render(request, 'generic_crud/criar.html', context)
+
+    def editar(self,request, pk,parent_id=None):
+        instance_object = self.model.objects.filter(pk=pk).first()
+        
+        form = self.form(request.POST or None, request.FILES or None, instance=instance_object)
+        
+        if request.method == 'POST' and form.is_valid():
+            try:
+                form.save()
+                messages.success(request, self.EDITADO_SUCESSO)
+            except Exception: # pragma: no cover
+                if request.is_ajax(): # pragma: no cover
+                    return HttpResponse(json.dumps(dict(form.errors.items())), status=400, content_type='application/json')        
+                messages.error(request, self.ERRO_EDITAR)
+
+            return redirect(f'/{self.model._meta.app_label}/{self.namespace}-visualizar/{instance_object.id}')
+        else:
+            if request.is_ajax():# pragma: no cover
+                errors = dict(form.errors.items())
+                return HttpResponse(json.dumps(errors), status=400, content_type="application/json")
+
+        context = {
+            'parent_id': parent_id,
+            'form': form,
+            'instance_object': instance_object,
+            'crud': self
+        }
+
+        if parent_id:
+            context['parent_id'] = parent_id
+
+        return render(request, 'generic_crud/editar.html', context)
+
+    def excluir(self, request, pk, parent_id=None):
+        
+        instance_object = self.model.objects.filter(pk=pk).first()
+        
+        if instance_object:
+            try:
+                instance_object.delete()
+                messages.success(request, f'{self.label} removido com sucesso!')
+            except Exception: # pragma: no cover
+                messages.error(request, f'Não foi possivel remover a {self.label}!')
+
+
+        return HttpResponseRedirect(reverse('terceirizados:visualizar_terceirizado', args=[parent_id]))
+    
+
+    def get_urls(self):
+        return [
+            path(f"{self.namespace}-criar/", self.criar, name=f'{self.namespace}_criar'),
+            path(f"{self.namespace}-criar/<parent_id>/", self.criar, name=f'{self.namespace}_criar'),
+
+            path(f"{self.namespace}-visualizar/<pk>/<parent_id>/", self.visualizar, name=f'{self.namespace}_visualizar'),
+            path(f"{self.namespace}-visualizar/<pk>/", self.visualizar, name=f'{self.namespace}_visualizar'),
+
+            path(f"{self.namespace}-editar/<pk>/<parent_id>/", self.editar, name=f'{self.namespace}_editar'),
+            path(f"{self.namespace}-editar/<pk>/", self.editar, name=f'{self.namespace}_editar'),
+
+            path(f"{self.namespace}-excluir/<pk>/<parent_id>/", self.excluir, name=f'{self.namespace}_excluir'),
+            path(f"{self.namespace}-excluir/<pk>/", self.excluir, name=f'{self.namespace}_excluir'),
+        ]
+
+    def get_form(self):
+        class Meta:
+            model = self.model
+            fields = self.get_form_fields()
+            label_form = self.label
+
+        def __init__(self, *args, **kwargs):
+            super(GenericForm, self).__init__(*args, **kwargs)
+            for field in self.fields:
+                self.fields[field].widget.attrs['class'] = 'vTextField'
+
+        # Cria uma nova classe de formulário usando type
+        GenericForm = type('GenericForm', (forms.ModelForm,), {'Meta': Meta,'__init__': __init__})
+
+        return GenericForm
+
+    def get_form_fields(self):
+        return list(self.form_fields.keys())
