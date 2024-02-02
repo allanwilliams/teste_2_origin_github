@@ -18,9 +18,9 @@ User = get_user_model()
 def importar_usuarios(request):
     result_context = return_context(request)    
 
-    context = result_context.context
-    template = result_context.template
-    
+    context = result_context['context']
+    template = result_context['template']
+
     return render(request, template, context)
 
 def return_context(request):
