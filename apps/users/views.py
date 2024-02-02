@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from apps.users.forms import ImportarUsuariosForm, PerfilForm
 from apps.users.models import Papeis
-from apps.users.helpers import processar_linha_csv, processar_usuarios_fusionauth
+from apps.users.helpers import processar_usuarios_fusionauth
 import os
 import csv
 
@@ -16,6 +16,7 @@ User = get_user_model()
 @login_required
 @permission_required("users.add_user", raise_exception=True)
 def importar_usuarios(request):
+    from apps.users.helpers import processar_linha_csv
     mensagem = ''
     data = []
     fusionauth_users = []
