@@ -16,6 +16,14 @@ User = get_user_model()
 @login_required
 @permission_required("users.add_user", raise_exception=True)
 def importar_usuarios(request):
+    result_context = return_context(request)    
+
+    context = result_context.context
+    template = result_context.template
+    
+    return render(request, template, context)
+
+def return_context(request):
     from apps.users.helpers import processar_linha_csv
     mensagem = ''
     data = []
@@ -57,8 +65,10 @@ def importar_usuarios(request):
         'grupos': grupos,
     }
 
-    return render(request, 'importar_usuarios.html', context)
-
+    return {
+        'context': context,
+        'template': 'importar_usuarios.html'
+    }
 @login_required
 def user_perfil(request, id):
     user =  User.objects.filter(pk=request.user.id).first()
