@@ -64,6 +64,7 @@ def processar_linha_csv(row):
         user_data = {
             'is_superuser': False,
             'username': username,
+            'name': nome.title(),
             'first_name':  nome.split()[0] if len(nome.split()) > 0 else '',
             'last_name': nome.split()[-1] if len(nome.split()) > 1 else '',
             'email': email.strip(),
