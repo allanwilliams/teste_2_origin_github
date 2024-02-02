@@ -24,7 +24,32 @@ def encfile(src): # pragma: no cover
         
 @register.filter
 def dd(src): # pragma: no cover
-    return dir(src)
+    import json
+    dicts = dir(src)
+    object_data = {}
+    for di in dicts:
+        if not str(di).startswith('_'):
+            try:
+                object_rel = getattr(src,di)
+                if hasattr(object_rel,'__dict__') and di not in ['DoesNotExist','Meta','MultipleObjectsReturned']:
+                    object_data[di] = vars(object_rel)
+                    if object_data[di]['_state']:
+                        del object_data[di]['_state']
+            except: pass
+    return convert_to_html_ul_li(object_data)
+    # return "<ul>" + json.dumps(object_data, indent=4, sort_keys=True, default=str) + "</ul>"
+    return object_data
+
+def convert_to_html_ul_li(obj, parent_key=''):
+    html = '<ul>'
+    for key, value in obj.items():
+        current_key = f'{parent_key}.{key}' if parent_key else key
+        if isinstance(value, dict):
+            html += f'<li>{key}: {convert_to_html_ul_li(value, current_key)}</li>'
+        else:
+            html += f'<li>{key}: {value}</li>'
+    html += '</ul>'
+    return html
 
 @register.filter(name='get_nested_attr')
 def get_nested_attr(obj, key):
