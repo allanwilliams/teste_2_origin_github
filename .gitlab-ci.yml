@@ -45,4 +45,4 @@ SonarQubeCheck:
         -Dsonar.sources=apps
   allow_failure: true
   only:
-    - master
+    - main
