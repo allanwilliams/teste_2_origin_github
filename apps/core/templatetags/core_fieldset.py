@@ -35,10 +35,8 @@ def dd(src): # pragma: no cover
                     object_data[di] = vars(object_rel)
                     if object_data[di]['_state']:
                         del object_data[di]['_state']
-            except: pass
+            except Exception: pass
     return convert_to_html_ul_li(object_data)
-    # return "<ul>" + json.dumps(object_data, indent=4, sort_keys=True, default=str) + "</ul>"
-    return object_data
 
 def convert_to_html_ul_li(obj, parent_key=''):
     html = '<ul>'
