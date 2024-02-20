@@ -248,7 +248,7 @@ class GenericCrud:
         if parent_id:
             context['parent_id'] = parent_id
 
-        return render(request, 'generic_crud/visualizar.html', context)
+        return render(request, 'generic_crud/generic_visualizar.html', context)
     
     def criar(self,request,parent_id=None):
         form = self.form
@@ -280,7 +280,7 @@ class GenericCrud:
         if parent_id:
             context['parent_id'] = parent_id
 
-        return render(request, 'generic_crud/criar.html', context)
+        return render(request, 'generic_crud/generic_criar.html', context)
 
     def editar(self,request, pk,parent_id=None):
         instance_object = self.model.objects.filter(pk=pk).first()
@@ -312,7 +312,7 @@ class GenericCrud:
         if parent_id:
             context['parent_id'] = parent_id
 
-        return render(request, 'generic_crud/editar.html', context)
+        return render(request, 'generic_crud/generic_editar.html', context)
 
     def excluir(self, request, pk, parent_id=None):
         
