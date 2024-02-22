@@ -34,6 +34,7 @@
     background: radial-gradient(circle, rgba(0, 94, 60, 1) 0%, rgba(1, 54, 34, 1) 74%, rgba(0, 54, 34, 1) 100%);
     border-bottom: 1px solid var(--multi-head);
     color: var(--multi-head-text);
+    height: 50px;
 }
 
 #adminIndex{
@@ -639,4 +640,58 @@ input[type="number"], input[type="password"] {
     .w-45vh {
         width: 45vh !important;
     }
+    .main-footer {
+        margin-left: 290px;
+    }
+}
+
+@media (min-width: 768px) and (max-width:1441px)  {
+    .control-sidebar-bg, .control-sidebar {
+        width: 32vw;
+        right: -32vw;
+    }
+
+    form [class^="col-md"],
+    form [class^="col-lg"],
+    form [class^="col-xs"],
+    .col-md-12 [class^="col-md"],
+    .col-md-12 [class^="col-lg"],
+    .col-md-12 [class^="col-xs"]{
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    form .box-body .row label {
+        display: initial;
+        font-size: 12px;
+    }
+
+    form .vTextField, form .vURLField, form .vBigIntegerField, form .vDateField, form .vTimeField {
+        min-width: 70px;
+    }
+
+    .paragrafo-g {
+        font-size: 1em;
+    }
+
+    form .display-search .form-group {
+        zoom: 1 !important;
+    }
+    
+    .nav.navbar-nav li i {
+        font-size: 12px;
+    }
+}
+.side-perfil .user-header img,
+.side-perfil .user-header .img-circle {
+    width: 60px;
+    height: 60px;
+}
+
+.side-perfil hr {
+    margin: 10px;
+}
+
+.side-perfil .user-footer {
+    position: static;
 }
