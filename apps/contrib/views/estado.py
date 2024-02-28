@@ -21,6 +21,6 @@ class EstadoGenericCrud(GenericCrudAdmin):
     model = Estados
     label = 'Estados'
     list_fields = ('id','nome')
-    form_fields = ('id','nome')
+    form_fields = ('id','nome','sigla')
     view_fields = ('id','nome')
     is_parent = True

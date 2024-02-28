@@ -271,20 +271,18 @@ class GenericCrudAdmin():
             parent_class = self.get_parent_class(self)
         instance_object = self.verify_element_exists(request,pk)
         
-        if isinstance(instance_object,self.model):
-            context = {
-                'instance_object': instance_object,
-                'crud': self
-            }
-            
-            if parent_id and parent_class and self.parent_column:
-                context['parent_id'] = parent_id
-                context['parent_object'] = parent_class.objects.get(pk=parent_id)
-                context['back_url'] = f'/{parent_class._meta.app_label}/{parent_class._meta.model_name}-show/{parent_id}'
+        
+        context = {
+            'instance_object': instance_object,
+            'crud': self
+        }
+        
+        if parent_id and parent_class and self.parent_column:
+            context['parent_id'] = parent_id
+            context['parent_object'] = parent_class.objects.get(pk=parent_id)
+            context['back_url'] = f'/{parent_class._meta.app_label}/{parent_class._meta.model_name}-show/{parent_id}'
 
-            return render(request, self.view_template, context)
-
-        return instance_object
+        return render(request, self.view_template, context)
     
     def criar(self,request,parent_id=None):
         CRIADO_SUCESSO = f'{self.label} criado(a) com sucesso!'
@@ -336,41 +334,39 @@ class GenericCrudAdmin():
             parent_class = self.get_parent_class(self)
         instance_object = self.verify_element_exists(request,pk)
         
-        if isinstance(instance_object,self.model):
-            form = self.get_form()
-            form = form(request.POST or None, request.FILES or None, instance=instance_object)
-            
-            if request.method == 'POST' and form.is_valid():
-                try:
-                    form.save()
-                    messages.success(request, EDITADO_SUCESSO)
-                except Exception: # pragma: no cover
-                    if request.is_ajax(): # pragma: no cover
-                        return HttpResponse(json.dumps(dict(form.errors.items())), status=400, content_type='application/json')
-                    messages.error(request, ERRO_EDITAR)
-                if self.parent_column and parent_id:
-                    return redirect(f'/{parent_class._meta.app_label}/{parent_class._meta.model_name}-show/{parent_id}')
-                else:
-                    return redirect(f'/{self.model._meta.app_label}/{self.model._meta.model_name}-editar/{instance_object.id}')
-            else:
-                if request.is_ajax():# pragma: no cover
-                    errors = dict(form.errors.items())
-                    return HttpResponse(json.dumps(errors), status=400, content_type="application/json")
-
-            context = {
-                'parent_id': parent_id,
-                'form': form,
-                'instance_object': instance_object,
-                'crud': self
-            }
-
-            if parent_id and parent_class and self.parent_column:
-                context['parent_object'] = parent_class.objects.get(pk=parent_id)
-                context['back_url'] = f'/{parent_class._meta.app_label}/{parent_class._meta.model_name}-show/{parent_id}'
-
-            return render(request, self.edit_template, context)
         
-        return instance_object
+        form = self.get_form()
+        form = form(request.POST or None, request.FILES or None, instance=instance_object)
+        
+        if request.method == 'POST' and form.is_valid():
+            try:
+                form.save()
+                messages.success(request, EDITADO_SUCESSO)
+            except Exception: # pragma: no cover
+                if request.is_ajax(): # pragma: no cover
+                    return HttpResponse(json.dumps(dict(form.errors.items())), status=400, content_type='application/json')
+                messages.error(request, ERRO_EDITAR)
+            if self.parent_column and parent_id:
+                return redirect(f'/{parent_class._meta.app_label}/{parent_class._meta.model_name}-show/{parent_id}')
+            else:
+                return redirect(f'/{self.model._meta.app_label}/{self.model._meta.model_name}-editar/{instance_object.id}')
+        else:
+            if request.is_ajax():# pragma: no cover
+                errors = dict(form.errors.items())
+                return HttpResponse(json.dumps(errors), status=400, content_type="application/json")
+
+        context = {
+            'parent_id': parent_id,
+            'form': form,
+            'instance_object': instance_object,
+            'crud': self
+        }
+
+        if parent_id and parent_class and self.parent_column:
+            context['parent_object'] = parent_class.objects.get(pk=parent_id)
+            context['back_url'] = f'/{parent_class._meta.app_label}/{parent_class._meta.model_name}-show/{parent_id}'
+
+        return render(request, self.edit_template, context)
 
     def excluir(self, request, pk, parent_id=None):
         parent_class = None
@@ -395,43 +391,40 @@ class GenericCrudAdmin():
         
         instance_object = self.verify_element_exists(request,pk)
         
-        if isinstance(instance_object,self.model):
-            form = self.get_form()
-            form = form(request.POST or None, request.FILES or None, instance=instance_object)
-            if request.method == 'POST' and form.is_valid():
-                try:
-                    form.save()
-                    messages.success(request, EDITADO_SUCESSO)
-                except Exception: # pragma: no cover
-                    if request.is_ajax(): # pragma: no cover
-                        return HttpResponse(json.dumps(dict(form.errors.items())), status=400, content_type='application/json')        
-                    messages.error(request, ERRO_EDITAR)
-                
-                return redirect(f'/{self.model._meta.app_label}/{self.model._meta.model_name}-show/{pk}')
-                
-            context = {
-                'object_id': pk,
-                'instance_object': instance_object,
-                'parent_object': instance_object,
-                'form': form,
-                'crud': self,
-                'tabs': []
-            }
-            if len(self.tabs) > 0:
-                for tab in self.tabs:
-                    tab_models = []
-                    for tab_model in tab.models:
-                        tab_objects = tab_model.model.objects.filter(**{tab_model.parent_column:pk})
-                        tab_models.append({
-                            'self_tab':tab_model,
-                            'tab_model':tab_model.model,
-                            'objects': tab_objects
-                        })
-                    context['tabs'].append(tab_models)
+        form = self.get_form()
+        form = form(request.POST or None, request.FILES or None, instance=instance_object)
+        if request.method == 'POST' and form.is_valid():
+            try:
+                form.save()
+                messages.success(request, EDITADO_SUCESSO)
+            except Exception: # pragma: no cover
+                if request.is_ajax(): # pragma: no cover
+                    return HttpResponse(json.dumps(dict(form.errors.items())), status=400, content_type='application/json')        
+                messages.error(request, ERRO_EDITAR)
             
-            return render(request, self.show_template, context)
-
-        return instance_object
+            return redirect(f'/{self.model._meta.app_label}/{self.model._meta.model_name}-show/{pk}')
+            
+        context = {
+            'object_id': pk,
+            'instance_object': instance_object,
+            'parent_object': instance_object,
+            'form': form,
+            'crud': self,
+            'tabs': []
+        }
+        if len(self.tabs) > 0:
+            for tab in self.tabs:
+                tab_models = []
+                for tab_model in tab.models:
+                    tab_objects = tab_model.model.objects.filter(**{tab_model.parent_column:pk})
+                    tab_models.append({
+                        'self_tab':tab_model,
+                        'tab_model':tab_model.model,
+                        'objects': tab_objects
+                    })
+                context['tabs'].append(tab_models)
+        
+        return render(request, self.show_template, context)
     
     def get_form(self):
         if self.form:
