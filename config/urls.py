@@ -11,6 +11,7 @@ from ajax_select import urls as ajax_select_urls
 from apps.core.pastas_bloquedas import pastas_bloqueadas
 from apps.core.encrypt_url_utils import decrypt
 from apps.core.views import dash
+from apps.core.mixins import get_urls
 import os
 
 @login_required
@@ -74,6 +75,8 @@ for pasta in pastas_bloqueadas.keys():
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(
     settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+urlpatterns += get_urls()
 
 if settings.USE_FUSIONAUTH:
     urlpatterns += [

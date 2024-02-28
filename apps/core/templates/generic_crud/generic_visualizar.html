@@ -11,15 +11,30 @@
         <div class="box-body">
             <div class="row">
                 {% for field in crud.view_fields %}
+                {% if 'url' in field %}
+                    <div class="col-md-12">
+                        <p>
+                            <b>Arquivo</b>
+                            {% with url=instance_object|get_field_from_instance:field%}
+                            {% if url|url_is_renderizavel %}
+                                <embed src="{{ instance_object|get_field_from_instance:field|encfile }}" width="100%" height="500">     
+                            {% else %}
+                            <a href="{{ instance_object|get_field_from_instance:field|default:" - "|encfile }}">Arquivo</a>
+                            {% endif %}
+                            {% endwith %}
+                        </p>
+                    </div>
+                {% else %}
                 <div class="col-md-4">
-                    <p><b>{{field}}</b> {{instance_object|get_field_from_instance:field}} </p>
+                    <p><b>{{field|title}}:</b> {{instance_object|get_field_from_instance:field}} </p>
                 </div>
+                {% endif %}
                 {% endfor %}
             </div>
         </div>
         {% if parent_id %}
         <div class="box-footer">
-            <a class="btn bg-blue" href=""><i class="fa-solid fa-arrow-left"></i> Voltar</a>
+            <a class="btn bg-blue" href="{{back_url}}"><i class="fa-solid fa-arrow-left"></i> Voltar</a>
         </div>
         {% endif %}
     </div>

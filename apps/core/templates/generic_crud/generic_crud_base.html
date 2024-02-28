@@ -1,5 +1,5 @@
 {% extends 'admin/base.html' %}
-{% load static %}
+{% load static core_fieldset %}
 
 {% block extrastyle %}
 <link rel="stylesheet" href="{% static 'ajax_select/css/ajax_select.css' %}">
@@ -10,6 +10,7 @@
 <style>
     .box-body {
         background: #fff;
+        padding: 0.8em !important;
     }
     .content form .box-footer {
         background-color: #f5f5f5;
@@ -21,9 +22,6 @@
     .content form .box-body .select2-container {
         border-radius: 5px;
         box-shadow: 0px 1px 2px 0px #999;
-    }
-    .content-visualizar{
-        font-size:1.5em;
     }
     .card-perfil {
         box-shadow:  0px 0px 5px 0px rgba(0,0,0,0.3) !important;
@@ -59,12 +57,15 @@
         justify-content: center;
         flex-wrap: wrap;
     }
-    .flex-terceirizado {
+    .flex-assistido {
         display: flex;
         justify-content: center;   
         gap: 30px;
     }
-    .descricao-terceirizado {
+    .img-assistido-processo {
+        flex: 1;
+    }
+    .descricao-assistido {
         flex: 5;
     }
     .btn-label .label {
@@ -119,7 +120,7 @@
     .ml-1 {
         margin-left: 1rem;
     }
-    .botoes-acao-terceirizado{ 
+    .botoes-acao-assistido{ 
         display: flex;
         flex-direction: column;
         flex-wrap: wrap;
@@ -127,12 +128,12 @@
         align-items: center;
     }
 
-    .lista .botoes-acao-terceirizado a,
-    .lista .botoes-acao-terceirizado button {
+    .lista .botoes-acao-assistido a,
+    .lista .botoes-acao-assistido button {
         width: 200px;
     }
 
-    .img-terceirizado {
+    .img-assistido {
         height: 120px;
         width: 120px;
         display: block;
@@ -161,11 +162,11 @@
         border: 2px solid #27ae60;
     }
 
-    #assistido-processo-busca .card-perfil-dados .bloco-imagem {
+    #generic-crud-busca .card-perfil-dados .bloco-imagem {
         flex: 1;
         margin-left: 1rem;
     }
-    #assistido-processo-busca .card-perfil-dados .bloco-dados {
+    #generic-crud-busca .card-perfil-dados .bloco-dados {
         min-width: 0;
         flex: 5;
     }
@@ -174,49 +175,49 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        width: 100%;
+        width: 95%;
     }
-    #assistido-processo-busca .card-perfil-processos ul {
+    #generic-crud-busca .card-perfil-processos ul {
         list-style: none;
         height: 80px;
         overflow-y: scroll;
         padding: 0;
     }
-    #assistido-processo-resumo {
+    #generic-crud-resumo {
         min-height: 1000px;
     }
-    #assistido-processo-resumo .nav-tabs-custom .tab-content {
+    #generic-crud-resumo .nav-tabs-custom .tab-content {
         padding-top: 10px;
     }
-    #assistido-processo-resumo .nav-tabs-custom .tab-content .tab-pane-header {
+    #generic-crud-resumo .nav-tabs-custom .tab-content .tab-pane-header {
         display: flex;
         justify-content: flex-end;
         margin-bottom: 15px;
     }
-    #assistido-processo-resumo .nav-tabs-custom>.nav-tabs {
+    #generic-crud-resumo .nav-tabs-custom>.nav-tabs {
         padding-bottom: 10px;
     }
 
-    #assistido-processo-resumo .nav-tabs-custom #links-tabs li a {
-        padding: 10px 13px;
+    #generic-crud-resumo .nav-tabs-custom #links-tabs li a {
+        padding: 10px 8px;
     }
 
-    #assistido-processo-resumo .card-perfil-dados {
-        font-size: 1.2em;
+    #generic-crud-resumo .card-perfil-dados {
+        font-size: 1rem;
     }
 
-    #assistido-processo-resumo .card-perfil-dados .img-terceirizado {
+    #generic-crud-resumo .card-perfil-dados .img-assistido {
         height: 120px;
         min-width: 120px;
     }
 
-    .img-terceirizado .img-terceirizado {
+    .img-assistido-processo .img-assistido {
         height: 100px;
         width: 100px;
     }
 
-    #assistido-processo-resumo .card-perfil-dados .popover,
-    #assistido-processo-busca .card-perfil-dados .bloco-dados .popover {
+    #generic-crud-resumo .card-perfil-dados .popover,
+    #generic-crud-busca .card-perfil-dados .bloco-dados .popover {
         max-width: 400px;
         min-width: 400px;
     }
@@ -256,32 +257,127 @@
     }
 
     @media (max-width: 992px) {
-        #assistido-processo-busca .card-perfil-dados .bloco-dados .text-truncate {
+        #generic-crud-busca .card-perfil-dados .bloco-dados .text-truncate {
             white-space: initial;
         }
-        #assistido-processo-busca .card-perfil-dados {
+        #generic-crud-busca .card-perfil-dados {
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
         }
-        #assistido-processo-busca .card-perfil-processos {
+        #generic-crud-busca .card-perfil-processos {
             text-align: center;
+        }
+
+        #generic-crud-resumo  #header-processo #header-processo-botoes {
+            align-items: flex-start;
+            justify-content: center;
+            flex-direction: row;
         }
     }
 
-    td{
-        font-weight: 700;
-        font-size: 1.1em;
+    @media (min-width: 768px) and (max-width:1441px)  {
+        .card-perfil-dados{
+            margin-bottom: 0px;
+        }
+        .paragrafo-g {
+            font-size: 1em !important;
+        }
+
+        .img-assistido-processo .img-assistido {
+            height: 80px;
+            min-width: 80px;
+            width: 80px;
+        }
+
+        #generic-crud-resumo .card-perfil-dados .img-assistido,
+        .img-assistido,
+        .img-processo {
+            height: 80px;
+            min-width: 80px;
+            width: 80px;
+        }
+
+        .bloco-dados i,
+        #header-processo i {
+            font-size: 0.8em;
+        }
+
+        .bloco-dados{
+            font-size: 1rem !important;
+        }
+
+        .bloco-dados .btn.btn-sm,
+        #header-processo  {
+            padding: 3px 7px;
+            margin-bottom: 0px;
+            min-width: 25px;
+        }
+
+        .box-header>.fa, .box-header>.glyphicon, .box-header>.ion, .box-header .box-title {
+            font-size: 15px !important;
+        }
+
+        .overflow-processos {
+            height: unset;
+        }
+
+        p {
+            font-size: 0.9em;
+            margin: 0 0 5px;
+            flex-wrap: wrap;
+        }
+
+        #generic-crud-resumo #header-processo #header-processo-processo,
+        #generic-crud-resumo #header-processo #header-processo-assistido-1,
+        #generic-crud-resumo #header-processo #header-processo-assistido-2 {
+            padding: unset !important;
+        }
+
+        #generic-crud-resumo #header-processo {
+            justify-content: space-between;
+            gap: unset !important;
+        }
     }
-    .icon-lgbt{
-        background-image: url('{% static 'images/lgbtq.png' %}');
-        background-size: cover;
-        background-position: center center;
-        height: 1.5rem;
-        width: 1.7rem;
-        display: block;
+    #generic-crud-resumo  #header-processo {
+        /* display: flex; */
+        display: grid;
+        grid-template-columns: 4fr 2fr 2fr;
+        flex-wrap: nowrap;
+        /* align-items: center; */
+        /* align-content: stretch; */
+        gap: 15px;
     }
+
+
+    #generic-crud-resumo  #header-processo #header-processo-processo,
+    #generic-crud-resumo  #header-processo #header-processo-assistido-1, 
+    #generic-crud-resumo  #header-processo #header-processo-assistido-2  {
+        display: flex;
+        align-items: center;
+        padding: 0px 10px;
+    }
+
+    #generic-crud-resumo  #header-processo #header-processo-botoes {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    @media (min-width: 1441px) {
+        #header-processo {
+            justify-content: space-between;
+        }
+
+        p {
+            font-size: 1.2em;
+            margin: 0 0 5px;
+            flex-wrap: wrap;
+        }
+    }
+
 </style>
 {% endblock %}
 
@@ -295,8 +391,11 @@
     </div>
     <section class="content-header">
         <h1>{% block titulo %}{% endblock %}</h1>
+        <div class="header-complemento">
+            Nome{% if parent_object %}{{parent_object}}{% endif %}
+        </div>
     </section>
-
+    
 
     {% block conteudo %}{% endblock %}
 </div>
@@ -309,7 +408,6 @@
 <script type="text/javascript" src="{% static 'admin/js/admin/DateTimeShortcuts.js' %}"></script>
 <script type="text/javascript" src="{% static 'ajax_select/js/ajax_select.js' %}"></script>
 <script type="text/javascript" src="{% static 'ajax_select/js/bootstrap.js' %}"></script>
-<script type="text/javascript" src="{% static 'terceirizados/terceirizado-form.js' %}"></script>
 <script>
     $(document).ready(() => {
         $('[data-toggle="popover"]').popover()
