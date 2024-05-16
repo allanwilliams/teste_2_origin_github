@@ -12,6 +12,7 @@ from django.contrib.auth.models import Group
 from apps.users.choices import  CHOICES_SEXO_USER
 from apps.core.mixins import BaseModel
 from apps.core.utils import core_encrypt,core_decrypt
+from apps.core.encrypt_url_utils import encrypt
 import json
 import requests
 
@@ -300,6 +301,9 @@ class User(AbstractUser):
                     'value':credenciais.filter(sistema=sistema).first() or False
                 }
         return credenciais_obj
+    
+    def get_encrypt_id(self):
+        return encrypt(self.id)
     
 
 @receiver(post_save, sender=User)

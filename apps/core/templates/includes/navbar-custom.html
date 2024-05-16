@@ -126,7 +126,7 @@
             <hr>
             <div class="row">
                 <div class="col-md-6 col-xs-6" style="text-align: center;">                    
-                    <a  href="{% if use_fusionauth %}/django_sso_app/sso-change-password"{% else %}/admin/password_change/"{% endif %} class="item-footer">
+                    <a  href={% if use_fusionauth %}"/django_sso_app/sso-change-password"{% else %}"/admin/password_change/"{% endif %} class="item-footer">
                         <i class="fa-solid fa-lock"></i> {% trans 'Change password' %}
                     </a>
                 </div>
