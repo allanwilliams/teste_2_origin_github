@@ -76,7 +76,7 @@ class BaseModel(models.Model):
                             if field_value != original_value:
                                 changed_fields.append(field_name)
                     if len(changed_fields) > 0:
-                        comment = [{"changed": {"fields": changed_fields}}]
+                        comment = [{"changed": {"name":self._meta.verbose_name,"object": str(self),"fields": changed_fields}}]
                 except Exception: pass                
             
             reversion.set_comment(json.dumps(comment))
