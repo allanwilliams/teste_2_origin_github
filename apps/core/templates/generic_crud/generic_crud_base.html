@@ -88,7 +88,7 @@
         justify-content: flex-start;
         align-items: center;
         gap: 10px;
-        margin-bottom: 15px;
+        margin-bottom: 0.5em;
     }
     .d-flex {
         display: flex;
@@ -270,7 +270,7 @@
             text-align: center;
         }
 
-        #generic-crud-resumo  #header-processo #header-processo-botoes {
+        #generic-crud-resumo #header-processo #header-processo-botoes {
             align-items: flex-start;
             justify-content: center;
             flex-direction: row;
@@ -340,26 +340,30 @@
             gap: unset !important;
         }
     }
-    #generic-crud-resumo  #header-processo {
+    #generic-crud-resumo #header-processo {
         /* display: flex; */
         display: grid;
-        grid-template-columns: 4fr 2fr 2fr;
+        grid-template-columns: 2fr 2fr 2fr;
         flex-wrap: nowrap;
         /* align-items: center; */
         /* align-content: stretch; */
-        gap: 15px;
+        column-gap: 15px;
     }
 
 
-    #generic-crud-resumo  #header-processo #header-processo-processo,
-    #generic-crud-resumo  #header-processo #header-processo-assistido-1, 
-    #generic-crud-resumo  #header-processo #header-processo-assistido-2  {
+    #generic-crud-resumo #header-processo #header-processo-processo,
+    #generic-crud-resumo #header-processo #header-processo-assistido-1, 
+    #generic-crud-resumo #header-processo #header-processo-assistido-2  {
         display: flex;
-        align-items: center;
+        align-items: start;
         padding: 0px 10px;
     }
 
-    #generic-crud-resumo  #header-processo #header-processo-botoes {
+    #header-processo > *:nth-child(3n+1):last-child {
+        grid-column: 1 / -1;
+    }
+
+    #generic-crud-resumo #header-processo #header-processo-botoes {
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -378,6 +382,22 @@
         }
     }
 
+    .truncated {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .value-text {
+        font-size: 1.2em;
+    }
+    .bloco-dados {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        font-size: 1.3em;
+    }
 </style>
 {% endblock %}
 
@@ -392,7 +412,7 @@
     <section class="content-header">
         <h1>{% block titulo %}{% endblock %}</h1>
         <div class="header-complemento">
-            Nome{% if parent_object %}{{parent_object}}{% endif %}
+            {% if parent_object %}{{parent_object}}{% endif %}
         </div>
     </section>
     

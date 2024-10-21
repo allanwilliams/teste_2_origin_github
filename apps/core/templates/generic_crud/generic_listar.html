@@ -1,12 +1,14 @@
-{% load core_fieldset %}
+{% load static core_fieldset %}
 {% for tab_model in tab %}
     {% with meta=tab_model.tab_model|get_meta_from_classe %}
     {% if perms.atendimento.add_agendamentosprocessos %}
     <div class="tab-pane-header">
+        {% if tab_model.self_tab.action_buttons and not crud.disable_actions %}
         <a class="btn bg-blue"
             href="/{{meta.app_label}}/{{meta.model_name}}-criar/{{object_id}}">
             <i class="fa fa-plus-circle"></i>&nbsp;Novo
         </a>
+        {% endif %}
     </div>
     {% endif %}
     <table class="table table-bordered table-hover dataTable">
@@ -15,7 +17,9 @@
                 {% for field in tab_model.self_tab.tab_fields %}
                 <th>{{tab_model.tab_model|get_field_label_from_classe:field|title}}</th>
                 {% endfor %}
+                {% if tab_model.self_tab.action_buttons and not crud.disable_actions %}
                 <th style="width: 10%;">Ações</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -39,28 +43,34 @@
                 <td>{{ obj|get_field_from_instance:field|default:" - " }}</td>
                 {% endif %}
                 {% endfor %}
+                {% if tab_model.self_tab.action_buttons and not crud.disable_actions %}
                 <td>
-                    <a class="btn btn-sm bg-green" title="Visualizar"
-                    href="/{{meta.app_label}}/{{meta.model_name}}-visualizar/{{obj.id}}/{{object_id}}">
-                        <i class="fa fa-eye"></i>
-                    </a>
-                    {% if request.user.id == a.criado_por.id or request.user.id == a.defensor.user.id or request.user.id == a.lotacao.defensor.user.id or request.user.is_superuser %}
-                    
-                    {% with has_pai='/'|add:meta.app_label|add:'/'|add:meta.model_name|add:'-show/'|add:object_id|add:'/'|url_exists %}    
-                    <a class="btn btn-sm bg-orange" title="Editar"
-                        {% if has_pai %} target='_blank' {% endif %}
-                        href="/{{meta.app_label}}/{{meta.model_name}}-{% if has_pai %}show{% else %}editar{% endif %}/{{obj.id}}{% if not has_pai %}/{{object_id}}{% endif %}"
-                        >
-                        <i class="fa fa-pencil"></i>
-                    </a>
-
+                    {% if obj.can_view_crud %}
+                        <a class="btn btn-sm bg-green" title="Visualizar"
+                        href="/{{meta.app_label}}/{{meta.model_name}}-visualizar/{{obj.id}}/{{object_id}}">
+                            <i class="fa fa-eye"></i>
+                        </a>
+                    {% endif %}
+                    {% if request.user.id == a.criado_por.id or request.user.is_superuser %}
+                    {% with has_pai='/'|add:meta.app_label|add:'/'|add:meta.model_name|add:'-show/'|add:object_id|add:'/'|url_exists %}
+                        {% if obj.can_edit_crud %}
+                        <a class="btn btn-sm bg-orange" title="Editar"
+                            {% if has_pai %} target='_blank' {% endif %}
+                            href="/{{meta.app_label}}/{{meta.model_name}}-{% if has_pai %}show{% else %}editar{% endif %}/{{obj.id}}{% if not has_pai %}/{{object_id}}{% endif %}"
+                            >
+                            <i class="fa fa-pencil"></i>
+                        </a>
+                        {% endif %}
                     {% endwith%}
-                    <a class="btn btn-sm bg-red delete-link" title="Excluir"
-                        href="/{{meta.app_label}}/{{meta.model_name}}-excluir/{{obj.id}}/{{object_id}}">
-                        <i class="fa fa-trash"></i>
-                    </a>
+                    {% if obj.can_delete_crud %}
+                        <a class="btn btn-sm bg-red delete-link" title="Excluir"
+                            href="/{{meta.app_label}}/{{meta.model_name}}-excluir/{{obj.id}}/{{object_id}}">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    {% endif %}
                     {% endif %}
                 </td>
+                {% endif %}
             </tr>
             
             {% for field in tab_model.self_tab.tab_fields %}

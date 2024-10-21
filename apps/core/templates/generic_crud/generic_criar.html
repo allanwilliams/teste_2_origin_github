@@ -11,6 +11,9 @@
         <form action="" method="POST" enctype="multipart/form-data">
             {% include 'generic_crud/generic_form_fields.html' %}
         </form>
+        {% for modal in crud.modais_criar %}
+            {% include modal %}
+        {% endfor %}
     </div>
 </section>
 {% endblock %}

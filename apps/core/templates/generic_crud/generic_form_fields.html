@@ -106,7 +106,7 @@
                         {% endif %}
                         
                         {% endfor %}
-                        {% if crud.parent_column and parent_id %}
+                        {% if crud.parent_column and parent_id and instance_object.id != parent_id %}
                         <input type="hidden" name="{{crud.parent_column}}" value="{{parent_id}}" />
                         {% endif %}
                     </div>

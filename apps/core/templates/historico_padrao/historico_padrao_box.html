@@ -1,0 +1,54 @@
+<style>
+    .historico-padrao .box-header .box-title {
+        margin-left: 15px;
+    }
+    .historico-padrao .box-default {
+        background-color: #F7F7F7 !important
+    }
+    .historico-padrao .timeline-item .timeline-header {
+        color:gray; 
+        font-weight:normal;
+    }
+    .historico-padrao .timeline-item .timeline-body {
+        color:#023407;
+    }
+    .bg-amarelo {
+        background-color: #FFFFE7 !important;
+    }
+    .bg-verde {
+        background-color: #E7FFE7 !important;
+    }  
+    .bg-roxo {
+        background-color: #E7F0FF !important;
+    }
+</style>
+<div class="historico-padrao" >
+    <div class="box box-default">
+        <div class="box-header with-border alert-success">
+            <h2 class="box-title">{% if historico_padrao.header %}{{historico_padrao.header}}{% else %}Histórico{% endif %}</h2>
+            <div class="box-tools pull-right">
+                {% if historico_padrao.template_header %}
+                {% include historico_padrao.template_header %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="box-body color-palette">
+            <ul class="timeline">
+                {% if historico_padrao.dados %}
+                    {% regroup historico_padrao.dados by criado_em.date as historico %}
+                    {% include "historico_padrao/parciais/historico_padrao_lista.html" %}
+                    <li>
+                        <i class="fa fa-clock bg-gray"></i>
+                    </li>
+                {% else %}
+                    <li>
+                        <i class="fa fa-clock bg-gray"></i>
+                        <div class="timeline-item">
+                            <h3 class="timeline-header">Nenhuma informação para mostrar</h3>
+                        </div>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>

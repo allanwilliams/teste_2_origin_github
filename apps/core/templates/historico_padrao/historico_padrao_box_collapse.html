@@ -1,0 +1,73 @@
+<style>
+    .historico-padrao .timeline-item .timeline-header {
+        color:gray; 
+        font-weight:normal;
+    }
+    .historico-padrao .timeline-item .timeline-body {
+        color:#023407;
+    }
+    .historico-padrao .box-tools {
+        display: flex;
+    }
+    .historico-padrao .box-tools a {
+        margin-right: 15px;
+    }
+    .historico-padrao .box-tools a:visited {
+        background-color: black;
+    }
+    .bg-amarelo {
+        background-color: #FFFFE7 !important;
+    }
+    .bg-verde {
+        background-color: #E7FFE7 !important;
+    }  
+    .bg-roxo {
+        background-color: #E7F0FF !important;
+    }
+    .bg-azul {
+        background-color: #D5F5FF !important;
+    }
+</style>
+
+<div class="col-md-12 historico-padrao">
+    <div class="box box-default">
+        <div class="box-header with-border alert-success">
+            <h2 class="box-title">{% if historico_padrao.header %}{{historico_padrao.header}}{% else %}Histórico{% endif %}</h2>
+            <div class="box-tools pull-right">
+                {% if historico_padrao.template_header %}
+                {% include historico_padrao.template_header %}
+                {% endif %}
+                {% if historico_padrao.url_externa %}
+                <a class="btn btn-block btn-default btn-sm" target="_blank" href="{{historico_padrao.url_externa }}">Histórico completo</a>
+                {% endif %}
+                <button type="button" class="btn btn-box-tool" 
+                        data-widget="collapse" 
+                        style="display: block;">
+                <i class="fa fa-plus"></i> Mostrar/Ocultar
+                </button>
+            </div>
+        </div>
+        <div class="box-body collapse-django color-palette">
+            <ul class="timeline">
+                {% if historico_padrao.dados %}
+                    {% regroup historico_padrao.dados by criado_em.date as historico %}
+                    {% if historico_padrao.template_lista %}
+                        {% include historico_padrao.template_lista %}
+                    {% else %}
+                        {% include "historico_padrao/parciais/historico_padrao_lista.html" %}
+                    {% endif %}
+                    <li>
+                        <i class="fa fa-clock bg-gray"></i>
+                    </li>
+                {% else %}
+                    <li>
+                        <i class="fa fa-clock bg-gray"></i>
+                        <div class="timeline-item">
+                            <h3 class="timeline-header">Nenhuma informação para mostrar</h3>
+                        </div>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
