@@ -5,7 +5,10 @@ from apps.core.mixins import AuditoriaAdmin
 from django.utils.html import format_html
 from .models import Lembretes
 from .forms import LembretesForm
-from apps.core.encrypt_url_utils import encrypt
+from apps.core.encrypt_url_utils import encrypt, decrypt
+from django.contrib import messages
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 class OrigemLembreteFilter(SimpleListFilter): # pragma: no cover
     title = 'Origem'
@@ -74,7 +77,7 @@ class LembretesAdmin(AuditoriaAdmin): # pragma: no cover
     )
 
     list_display = (
-        'titulo',
+        'get_titulo',
         'data',
         'get_origem',
         'get_destino',
@@ -104,6 +107,23 @@ class LembretesAdmin(AuditoriaAdmin): # pragma: no cover
                 'fields': ('status', 'lembrete_proprio', 'criado_em', 'criado_por', 'modificado_em', 'modificado_por'),
             }),
     )
+    
+    def get_titulo(self,instance):
+        return format_html('<a href="{url}">{text}</a>'.format(url=f'/admin/lembrete/lembretes/{instance.get_encrypt_id()}/change',text=instance.titulo))
+    get_titulo.short_description = "Título"
+
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        object_id = decrypt(object_id)
+        obj = self.get_object(request, object_id)
+        
+        if obj is None:
+            messages.error(request, "Registro não localizado.")
+            return HttpResponseRedirect(reverse('admin:lembrete_lembretes_changelist'))
+        
+        return super(LembretesAdmin, self).change_view(
+            request, object_id, form_url, extra_context=extra_context,
+        )
 
     def get_documento(self, obj):
         if obj.documento:

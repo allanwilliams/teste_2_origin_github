@@ -5,6 +5,7 @@ from apps.core.encrypt_url_utils import encrypt
 
 class LembretesSerializer(ModelSerializer): # pragma: no cover
     documento = serializers.SerializerMethodField('get_documento')
+    encid = serializers.SerializerMethodField('get_encid')
     class Meta:
         model = Lembretes
         fields = '__all__'
@@ -13,3 +14,7 @@ class LembretesSerializer(ModelSerializer): # pragma: no cover
         if obj.documento:
             diretorio,nome = str(obj.documento).split('/')
             return str(f"/media/{diretorio}/{encrypt(nome)}")
+        
+    def get_encid(self,obj):
+        if obj:
+            return obj.get_encrypt_id()
