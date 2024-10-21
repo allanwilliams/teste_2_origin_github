@@ -1,0 +1,39 @@
+{% for a in historico %}
+<li class="time-label">
+    <span class="bg-blue">
+        {{a.grouper|date:"d/m/Y"}}
+    </span>
+</li>
+{% for i in a.list %}
+{% if i.evento == 'Adicionou' and historico_padrao.template_lista_item %}
+{% include historico_padrao.template_lista_item %}
+{% else %}
+<li>
+    <i class="fa 
+      {% if i.evento == 'Adicionou' %} fa-plus bg-green 
+      {% elif i.evento == 'Revertido' %} fa-undo bg-red 
+      {% elif i.evento == 'Alterou' %} fa-pencil bg-yellow 
+      {% elif i.evento == 'Legado' %} fa-warning bg-orange 
+      {% elif i.evento == 'Deletou' %} fa-trash bg-red {% endif %}"></i>
+        
+    <div class="timeline-item">
+        <span class="time"><i class="fa fa-clock"></i> {{ i.criado_em|date:"H:i:s" }}</span>
+        <h3 class="timeline-header">
+            {{ i.usuario }} - {{ i.usuario_papel }} -
+            {% if i.evento == 'Adicionou' or i.evento == 'Deletou' %}
+            {{i.evento}}
+            um(a) <b>{{i.verbose}}</b>: {{ i.referencia }}
+            {% elif i.evento == 'Revertido' or i.evento == 'Legado' %}
+            <b>{{i.verbose}}</b>
+            {% else %}
+            {{i.evento}}
+            o campo {{i.campo}} de <b>{{i.verbose}}</b> {%if i.referencia%} do registro: {{ i.referencia }} {% endif %} para: {{ i.valor }}
+            {% endif %}
+        </h3>
+        <div class="timeline-body">
+        </div>
+    </div>
+</li>
+{% endif %}
+{% endfor %}
+{% endfor %}

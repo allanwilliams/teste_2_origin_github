@@ -65,20 +65,28 @@ class BaseModel(models.Model):
         
         with reversion.create_revision():
             comment = []
-            if original and self._meta.model_name not in ['userpage','usersession']:
+            if original and self._meta.model_name not in ['userpage', 'usersession']:
                 try:
                     changed_fields = []
                     for field in self._meta.fields:
                         field_name = f'{field.name}_id' if isinstance(field, models.ForeignKey) else field.name
-                        if field_name not in ['criado_por_id','criado_por','criado_em','modificado_por','modificado_por_id','modificado_em']:
+                        if field_name not in ['criado_por_id', 'criado_em', 'modificado_por_id', 'modificado_em']:
                             field_value = getattr(self, field_name)
                             original_value = getattr(original, field_name)
                             if field_value != original_value:
                                 changed_fields.append(field_name)
+                    
                     if len(changed_fields) > 0:
                         comment = [{"changed": {"name":self._meta.verbose_name,"object": str(self),"fields": changed_fields}}]
-                except Exception: pass                
-            
+                except Exception as e:
+                    pass                
+            else:
+                if self._meta.model_name not in ['userpage', 'usersession']:
+                    try:
+                        comment = [{"added": {"name":self._meta.verbose_name,"object": str(self)}}]
+                    except:
+                        comment = [{"added": {"name":self._meta.verbose_name,"object": ''}}]
+
             reversion.set_comment(json.dumps(comment))
             reversion.set_user(get_current_authenticated_user())
             super(BaseModel, self).save(*args, **kwargs)
@@ -95,6 +103,34 @@ class BaseModel(models.Model):
             new_values[index] = new_value
             values = tuple(new_values)
         return super().from_db(db, field_names, values)
+    
+    def can_edit_crud(self):
+        current_user = get_current_authenticated_user()
+        if current_user.has_perm(f'{self._meta.app_label}.change_{self._meta.model_name}'):
+            return True
+        
+        return False
+    
+    def can_delete_crud(self):
+        current_user = get_current_authenticated_user()
+        if current_user.has_perm(f'{self._meta.app_label}.delete_{self._meta.model_name}'):
+            return True
+        
+        return False
+    
+    def can_add_crud(self):
+        current_user = get_current_authenticated_user()
+        if current_user.has_perm(f'{self._meta.app_label}.add_{self._meta.model_name}'):
+            return True
+        
+        return False
+
+    def can_view_crud(self):
+        current_user = get_current_authenticated_user()
+        if current_user.has_perm(f'{self._meta.app_label}.view_{self._meta.model_name}'):
+            return True
+        
+        return False
 
 
 class BaseModelDRF(models.Model):
@@ -222,6 +258,10 @@ def compact(*names):
 _models_crud_registry = {}
 
 def get_urls():
+    '''
+        cria urls dos cruds genéricos
+    '''
+    
     urls = []
     for model, model_admin in _models_crud_registry.items():
         model_name = model_admin.model._meta.model_name
@@ -248,10 +288,40 @@ def get_urls():
     return urls
 
 class GenericCrudAdmin():
+    '''
+        Constrói classe admin do Crud Genérico
+        instance = instancia do objeto
+        resumo = uma tupla contendo as colunas que irão aparecer na tela do pai
+        resumo_title_column = desabilitada
+        is_parent = informa se o crud gerado possui filhos (ex: processos possuem atividades/agendamentos...)
+        tabs = recebe um array com as tabs do pai (as tabs são heranças de <GenericCrudTab>)
+        is_many = desabilitada
+        model = model que será usada no crud
+        label = Identifica a model (utilizado para mensagens de alerta no sistema e na apresentação de dados em tela)
+        list_fields = desabilitada
+        form_fields = fields que irão compor a construção do formulario genérico
+        view_fields = fields que serão exibidos na tela de visualizar do crud genérico
+        parent_column = coluna que estabelece a relação entre pai e filho
+        form = o formulário do crud pode ser sobreescrito
+        modais_visualizar = actions e/ou modais que serão incorporados na tela do show pai
+        modais_editar = actions e/ou modais que serão incorporados na tela de edição
+        modais_criar = actions e/ou modais que serão incorporados na tela de criação
+        url_externaurl_externa = usada no historico padrão. Consultar contrução do historico
+        template_lista_item = usada no historico padrão. Consultar contrução do historico
+        template_header = usada no historico padrão. Consultar contrução do historico
+        disable_actions = se True desabilita os botões de edição do pai e dos filhos
+
+        view_template = template da tela de view
+        add_template = template da tela de add
+        edit_template = template da tela de edit
+        show_template = template da tela do pai
+    '''
+    instance = None
     resumo = None
     resumo_title_column = None
     is_parent = False
     tabs = None
+    is_many = False
     model = None
     label = None
     list_fields = ()
@@ -260,21 +330,45 @@ class GenericCrudAdmin():
     parent_column = None
     form = None
     _registry = {}
+    modais_visualizar = []
+    modais_editar = []
+    modais_criar = []
+    actions_top_bar = []
+    url_externa = None
+    template_lista_item = None
+    template_header = None
+    disable_actions = False
 
     view_template = 'generic_crud/generic_visualizar.html'
     add_template = 'generic_crud/generic_criar.html'
     edit_template = 'generic_crud/generic_editar.html'
     show_template = 'generic_crud/parent_visualizar.html'
-       
-    def visualizar(self,request, pk, parent_id=None):
+    
+    def validar_acesso(self):
+        current_user = get_current_authenticated_user()
+        if not current_user:
+            return redirect('/admin/login/')
+        return True
+
+    def visualizar(self,request, pk, parent_id=None,extra_context=None):
+        nao_autenticado = self.validar_acesso()
+
+        if isinstance(nao_autenticado,HttpResponseRedirect):
+            return nao_autenticado
+        
+        parent_class = None
         if self.parent_column:
             parent_class = self.get_parent_class(self)
         instance_object = self.verify_element_exists(request,pk)
-        
-        
+
+        # caso a instance não seja da model do crud irá retornar para o redirect enviado por verify_element_exists
+        if isinstance(instance_object,HttpResponseRedirect):
+            return instance_object
+                    
         context = {
             'instance_object': instance_object,
-            'crud': self
+            'crud': self,
+            **(extra_context or {}),
         }
         
         if parent_id and parent_class and self.parent_column:
@@ -284,13 +378,17 @@ class GenericCrudAdmin():
 
         return render(request, self.view_template, context)
     
-    def criar(self,request,parent_id=None):
+    def criar(self,request,parent_id=None,extra_context=None):
+        nao_autenticado = self.validar_acesso()
+
+        if isinstance(nao_autenticado,HttpResponseRedirect):
+            return nao_autenticado
+        
         CRIADO_SUCESSO = f'{self.label} criado(a) com sucesso!'
         ERRO_INTERNO = f'Erro interno ao criar {self.label}!'
         parent_class = None
         if self.parent_column:
             parent_class = self.get_parent_class(self)
-
         form = self.get_form()
 
         if request.method == 'POST':
@@ -317,7 +415,8 @@ class GenericCrudAdmin():
         context = {
             'form': form,
             'parent_id': parent_id,
-            'crud': self
+            'crud': self,
+            **(extra_context or {}),
         }
 
         if parent_id and parent_class and self.parent_column:
@@ -326,7 +425,12 @@ class GenericCrudAdmin():
 
         return render(request, self.add_template, context)
 
-    def editar(self,request, pk,parent_id=None):
+    def editar(self,request, pk,parent_id=None,extra_context=None):
+        nao_autenticado = self.validar_acesso()
+
+        if isinstance(nao_autenticado,HttpResponseRedirect):
+            return nao_autenticado
+        
         EDITADO_SUCESSO = f'{self.label} editado(a) com sucesso!'
         ERRO_EDITAR = f'Erro ao editar {self.label}!'
         parent_class = None
@@ -334,6 +438,9 @@ class GenericCrudAdmin():
             parent_class = self.get_parent_class(self)
         instance_object = self.verify_element_exists(request,pk)
         
+        # caso a instance não seja da model do crud irá retornar para o redirect enviado por verify_element_exists
+        if isinstance(instance_object,HttpResponseRedirect):
+            return instance_object
         
         form = self.get_form()
         form = form(request.POST or None, request.FILES or None, instance=instance_object)
@@ -344,7 +451,7 @@ class GenericCrudAdmin():
                 messages.success(request, EDITADO_SUCESSO)
             except Exception: # pragma: no cover
                 if request.is_ajax(): # pragma: no cover
-                    return HttpResponse(json.dumps(dict(form.errors.items())), status=400, content_type='application/json')
+                    return HttpResponse(json.dumps(dict(form.errors.items())), status=400, content_type='application/json')        
                 messages.error(request, ERRO_EDITAR)
             if self.parent_column and parent_id:
                 return redirect(f'/{parent_class._meta.app_label}/{parent_class._meta.model_name}-show/{parent_id}')
@@ -356,10 +463,11 @@ class GenericCrudAdmin():
                 return HttpResponse(json.dumps(errors), status=400, content_type="application/json")
 
         context = {
-            'parent_id': parent_id,
+            'parent_id': int(parent_id) if parent_id else parent_id,
             'form': form,
             'instance_object': instance_object,
-            'crud': self
+            'crud': self,
+            **(extra_context or {}),
         }
 
         if parent_id and parent_class and self.parent_column:
@@ -368,7 +476,12 @@ class GenericCrudAdmin():
 
         return render(request, self.edit_template, context)
 
-    def excluir(self, request, pk, parent_id=None):
+    def excluir(self, request, pk, parent_id=None,extra_context=None):
+        nao_autenticado = self.validar_acesso()
+
+        if isinstance(nao_autenticado,HttpResponseRedirect):
+            return nao_autenticado
+        
         parent_class = None
         if self.parent_column:
             parent_class = self.get_parent_class(self)
@@ -385,12 +498,22 @@ class GenericCrudAdmin():
         if self.parent_column and parent_id and self.parent_column:
             return redirect(f'/{parent_class._meta.app_label}/{parent_class._meta.model_name}-show/{parent_id}')
         
-    def show_pai(self, request, pk):
+    def show_pai(self, request, pk,extra_context=None):
+        nao_autenticado = self.validar_acesso()
+
+        if isinstance(nao_autenticado,HttpResponseRedirect):
+            return nao_autenticado
+        
+        from apps.core.helpers.historico_padrao import get_historico
         EDITADO_SUCESSO = f'{self.label} editado(a) com sucesso!'
         ERRO_EDITAR = f'Erro ao editar {self.label}!'
         
         instance_object = self.verify_element_exists(request,pk)
+        # caso a instance não seja da model do crud irá retornar para o redirect enviado por verify_element_exists
+        if isinstance(instance_object,HttpResponseRedirect):
+            return instance_object
         
+        self.instance = instance_object
         form = self.get_form()
         form = form(request.POST or None, request.FILES or None, instance=instance_object)
         if request.method == 'POST' and form.is_valid():
@@ -403,14 +526,38 @@ class GenericCrudAdmin():
                 messages.error(request, ERRO_EDITAR)
             
             return redirect(f'/{self.model._meta.app_label}/{self.model._meta.model_name}-show/{pk}')
-            
+        
+        historico = get_historico(
+            id=[pk], 
+            eventos=['added','changed'], 
+            model_app=self.model, 
+            campos_bloqueados=['num_processo'], 
+            extra_data=[]
+        )
+
+        historico_padrao = {
+            'dados': historico,
+            'header': 'Movimentações Principais',
+            'url_externa': self.url_externa,
+            'template_lista_item': self.template_lista_item,
+            'template_header': self.template_header,
+            'dados_header': [
+                {'label': 'Defensor(a)', 'cor': 'bg-verde'},
+                {'label': 'Estagiário(a)', 'cor': 'bg-roxo'},
+                {'label': 'Colaborador(a)', 'cor': 'bg-amarelo'},
+                {'label': 'Assessor(a)', 'cor': 'bg-azul'},
+            ]
+        }
+
         context = {
             'object_id': pk,
             'instance_object': instance_object,
             'parent_object': instance_object,
             'form': form,
             'crud': self,
-            'tabs': []
+            'historico_padrao': historico_padrao,
+            'tabs': [],
+            **(extra_context or {}),
         }
         if len(self.tabs) > 0:
             for tab in self.tabs:
@@ -423,6 +570,14 @@ class GenericCrudAdmin():
                         'objects': tab_objects
                     })
                 context['tabs'].append(tab_models)
+                historico_tab = get_historico(
+                    id=[tab.id for tab in tab_objects], 
+                    eventos=['added','changed'], 
+                    model_app=tab_model.model, 
+                    campos_bloqueados=['num_processo'], 
+                    extra_data=context['historico_padrao']['dados']
+                )
+                context['historico_padrao']['dados'] = historico_tab
         
         return render(request, self.show_template, context)
     
@@ -480,10 +635,7 @@ class GenericCrudAdmin():
     #     return fields
 
     def get_parent_class(self, crud):
-        try:
-            return crud.model._meta.get_field(crud.parent_column).related_model
-        except:
-            return crud.model._meta.get_field(crud.parent_column).model
+        return crud.model._meta.get_field(crud.parent_column).related_model
     
     def verify_element_exists(self,request,pk):
         instance_object = self.model.objects.filter(pk=pk).first()
@@ -510,10 +662,18 @@ class GenericCrudTab():
     models = None
 
 class GerericCrudTabModel():
-    models = None
+    '''
+        model = Model da tab
+        tab_fields = lista de fields que serão apresentados na lista de registros da tab
+        parent_column = coluna que estabelece a relação entre pai e filho
+        model_name = Nome da model (será utilizada para gerar o ID da tab dentro do show do pai)
+        action_buttons = se False os botões de action da tab serão removidos
+    '''
+    model = None
     tab_fields = None
     parent_column = None
     model_name = None
+    action_buttons = True
 
 def register(*models, site=None):
     def _model_admin_wrapper(admin_class):
@@ -524,4 +684,4 @@ def register(*models, site=None):
             raise ValueError('Wrapped class must subclass GenericCrudAdmin.')
 
         _models_crud_registry[models] = admin_class()
-    return _model_admin_wrapper
+    return _model_admin_wrapper    

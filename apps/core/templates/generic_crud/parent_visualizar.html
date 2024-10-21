@@ -5,12 +5,16 @@
 {% block conteudo %}
 <section class="content" id="generic-crud-resumo">
     <input type="hidden" id="parent_id" value="{{parent_id}}">
+    <input type="hidden" id="instance-object-id" value="{{object_id}}">
     <input type="hidden" id="processo_user_id" value="{{request.user.id}}">
     {% include 'generic_crud/parciais/generic_django_messages.html' %}
     {% include 'generic_crud/parciais/generic_form_errors.html' %}
     <div class="box">
-        <div class="box-header with-border" style="display: flex; align-items: center;">
-            <h4 class="box-title">{% if instance_object %}{{instance_object}}{% endif %}</h4> 
+        <div class="box-header with-border">
+            <h4 class="box-title">{% if instance_object %}{{instance_object}}{% endif %}</h4>
+            {% for action in crud.actions_top_bar %}
+                {% include action %}
+            {% endfor %}
         </div>
         <div class="box-body">
             <div id="header-processo">
@@ -20,7 +24,14 @@
                     <div class="card-perfil-dados">
                         <div class="bloco-dados">
                         {% for col in resumo_col%}
-                        <p><b>{{col|title}}:</b> {{instance_object|get_field_from_instance:col|default:'-'}}</p>
+                        {% with col_value=instance_object|get_field_from_instance:col %}
+                        <div>
+                            <p>
+                                <b>{{crud.model|get_field_label_from_classe:col|title}}:</b>
+                                {{ col_value|safe|default:'-' }}
+                            </p>
+                        </div>
+                        {% endwith %}
                         {% endfor %}
                         </div>
                     </div>
@@ -29,10 +40,15 @@
             </div>
             <div style="padding-left: 10px;">
                 {% with meta=crud.model|get_meta_from_classe %}
+                {% if not crud.disable_actions %}
                 <a class="btn btn-sm bg-gray" data-toggle="tooltip" data-placement="top" title="Editar {{crud.label}}" href="/{{meta.app_label}}/{{meta.model_name}}-editar/{{object_id}}/{{object_id}}"> 
                     <i class="fa fa-pencil" ></i>
                 </a>
+                {% endif %}
                 {% endwith %}
+                {% for modal in crud.modais_visualizar %}
+                    {% include modal %}
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -40,13 +56,19 @@
         <div class="box-body">
             <div class="nav-tabs-custom form-nav-tabs">
                 <ul class="nav nav-tabs" id="links-tabs">
+                    <li class="active"><a href="#tab-timeline" data-toggle="tab" aria-expanded="true" onclick="changeUrlHash('tab-timeline')">Histórico</a></li>
                     {% for tab in tabs %}
-                        <li {% if forloop.counter == 1 %} class="active" {% endif %}><a href="#{{tab.0.self_tab.model_name}}" data-toggle="tab" aria-expanded="true" onclick="changeUrlHash('{{tab.0.self_tab.model_name}}')">{{tab.0.self_tab.tab_name}}</a></li>
+                        <li><a href="#{{tab.0.self_tab.model_name}}" data-toggle="tab" aria-expanded="true" onclick="changeUrlHash('{{tab.0.self_tab.model_name}}')">{{tab.0.self_tab.tab_name}}</a></li>
                     {% endfor %}    
                 </ul>
                 <div class="tab-content">
+                    <div class="tab-pane active" id="tab-timeline">
+                        <div class="row">
+                            {% include "historico_padrao/historico_padrao_box_collapse.html" %}
+                        </div>
+                    </div> 
                     {% for tab in tabs %}
-                        <div class="tab-pane {% if forloop.counter == 1 %}active{% endif %}" id="{{tab.0.self_tab.model_name}}">
+                        <div class="tab-pane" id="{{tab.0.self_tab.model_name}}">
                             <div class="row">
                                 {% include 'generic_crud/generic_listar.html' %}
                             </div>

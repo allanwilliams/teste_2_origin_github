@@ -16,7 +16,7 @@ class EstadoGenericCrud(GenericCrudAdmin):
     resumo = [
         ('nome',),
     ]
-    tabs = [MunicipiosTab]
+    tabs = [MunicipiosTab,]
     resumo_title_column = 'nome'
     model = Estados
     label = 'Estados'
@@ -24,3 +24,4 @@ class EstadoGenericCrud(GenericCrudAdmin):
     form_fields = ('id','nome','sigla')
     view_fields = ('id','nome')
     is_parent = True
+    parent_column = 'id'
