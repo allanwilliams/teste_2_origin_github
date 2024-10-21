@@ -122,7 +122,7 @@ function populaLembretes({lembretes, msg, listaLembretesElRef, lblCountLembreteE
             listaEl += `<li>
                             <span  data-toggle="tooltip" data-placement="top" title="Clique para marcar como finalizado" onclick="finalizarLembrete(${l.id})" class="glyphicon glyphicon-unchecked ${corIcone(l.prioridade)}"></span>
                             <div class="bloco-lembrete-principal">
-                                <a href="/admin/lembrete/lembretes/${l.id}/change/">${l.titulo}</a> 
+                                <a href="/admin/lembrete/lembretes/${l.encid}/change/">${l.titulo}</a> 
                                 <div class="lembrete-principal-infos">
                                     ${obterLabelData(l.data)}  
                                     ${(l.status == 1) ? '<span class="lbl-new">não visualizado</span>' : ''}
