@@ -22,9 +22,6 @@ class LembretesModelTest(TestCase):
     def test_str_lembrete(self):
         self.assertTrue("Lembrete Teste" in str(self.lembrete))
 
-    # def test_verifica_origem(self):
-    #     self.assertEqual('Recebido',self.lembrete.verifica_origem())
-
     def test_get_origem(self):
         self.assertTrue(isinstance(self.lembrete.get_origem(),str))
 

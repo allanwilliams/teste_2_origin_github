@@ -74,7 +74,7 @@ def get_field_from_instance(obj,field):
     if type(prop) == int:
         try:
             prop = getattr(obj,f'get_{field}_display')()
-        except: pass
+        except Exception: pass
     return prop
 
 @register.filter
@@ -86,7 +86,7 @@ def get_field_label_from_classe(classe,field):
                 if isinstance(classe,models.ForeignKey):
                     classe = classe.model
                 classe = classe._meta.get_field(split)
-            except: pass
+            except Exception: pass
         return classe.verbose_name
     return classe._meta.get_field(field).verbose_name
 
@@ -102,17 +102,17 @@ def div_cols_new(field,crud):
     try:
         if 'cols' in model.__dict__ and field in model.cols:
             return model.cols[field]
-    except: pass
+    except Exception: pass
     return COLUMN_DEFAULT
 
 @register.filter
 def url_is_renderizavel(url):
-    type = url.split('.')[-1]
-    return type and type.lower() in ['pdf', 'jpg', 'jpeg', 'png']
+    type_extension = url.split('.')[-1]
+    return type_extension and type_extension.lower() in ['pdf', 'jpg', 'jpeg', 'png']
 
 @register.filter
 def url_exists(url):
     try:
         resolve(url)
         return True
-    except: return False
+    except Exception: return False
