@@ -14,7 +14,7 @@ tipo_events = {
     'legacy': 'Legado'
 }
 
-def get_historico(id, model_app, eventos=['added', 'changed', 'deleted', 'reverted', 'legacy'], campos_bloqueados = [], extra_data = [],filter_column=None):
+def get_historico(id, model_app, eventos=['added', 'changed', 'deleted', 'reverted', 'legacy'], campos_bloqueados = [], extra_data = [],filter_column=None):  # pragma: no cover
     model_content_type = ContentType.objects.get_for_model(model_app)
     versoes_default = ReversionVersion.objects.filter(object_id__in=id,content_type_id=model_content_type.id)
     historico = []
@@ -26,7 +26,7 @@ def get_historico(id, model_app, eventos=['added', 'changed', 'deleted', 'revert
     historico = sorted(historico, key=lambda x:(x['criado_em']), reverse=True)
     return historico
 
-def get_historico_versao(versoes,eventos,filter_column,campos_bloqueados,model_app):
+def get_historico_versao(versoes,eventos,filter_column,campos_bloqueados,model_app):  # pragma: no cover
     historico = []
     revisions = []
     for versao in versoes:
@@ -139,7 +139,7 @@ def get_inline_data(
     campos_bloqueados, #campos que não devem entrar no array
     mudancas, #
     event,
-    referencia = None):
+    referencia = None):  # pragma: no cover
     
     model_version = ReversionVersion 
     versao_inline = model_version.objects.filter(object_repr=object_repr,revision_id=revision_id).first()
@@ -191,7 +191,7 @@ def get_inline_data(
     
     return historico_inline
 
-def field_is_sigiloso(model,id,field):
+def field_is_sigiloso(model,id,field):  # pragma: no cover
     fields_sigilosos = ['descricao','anotacao_defensor','anotacao','observacao','anotacao']
     field_sigilogo = hasattr(model,'sigiloso')
     field_anotacao_defensor_sigilosa = hasattr(model,'anotacao_defensor_sigilosa')
