@@ -47,7 +47,7 @@ def get_historico_versao(versoes,eventos,filter_column,campos_bloqueados,model_a
                 comments = json.loads(revision.comment)
             else:
                 comments = json.loads(revision.comment)
-        except Exception as e:
+        except Exception:
             str_acao = 'legacy'
 
             if 'Revertido' in revision.comment:
@@ -129,7 +129,7 @@ def get_historico_versao(versoes,eventos,filter_column,campos_bloqueados,model_a
                                             }
                                             if hist not in historico:
                                                 historico.append(hist)
-                                    except Exception as e: 
+                                    except Exception: 
                                         pass
     
     return historico
@@ -140,7 +140,7 @@ def get_inline_data(
     campos_bloqueados, #campos que não devem entrar no array
     mudancas, #
     event,
-    referencia = None,log=False):
+    referencia = None):
     
     model_version = ReversionVersion 
     versao_inline = model_version.objects.filter(object_repr=object_repr,revision_id=revision_id).first()
@@ -161,12 +161,12 @@ def get_inline_data(
                             try:
                                 ids_relateds = inline_serialized_data.get('fields').get(campo)
                                 value_campo = field.related_model.objects.filter(id__in=ids_relateds).first()
-                            except:
+                            except Exception:
                                 try:
                                     campo_editado = campo.split('_id')[0]
                                     ids_relateds = inline_serialized_data.get('fields').get(campo_editado)
                                     value_campo = field.related_model.objects.filter(id__in=[ids_relateds]).first()
-                                except: pass
+                                except Exception: pass
                         if field.choices:
                             value_campo = list(filter(lambda choice: choice[0] == value_campo,field.choices))[0][1]
 
@@ -188,7 +188,7 @@ def get_inline_data(
                             'valor': value_campo,
                             'criado_em': data_modificacao
                         })
-                    except: pass
+                    except Exception: pass
     
     return historico_inline
 
