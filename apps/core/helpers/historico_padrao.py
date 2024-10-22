@@ -26,7 +26,7 @@ def get_historico(id, model_app, eventos=['added', 'changed', 'deleted', 'revert
     historico = sorted(historico, key=lambda x:(x['criado_em']), reverse=True)
     return historico
 
-def get_historico_versao(versoes,eventos,filter_column,campos_bloqueados,model_app,log=False):
+def get_historico_versao(versoes,eventos,filter_column,campos_bloqueados,model_app):
     historico = []
     revisions = []
     for versao in versoes:
@@ -84,7 +84,6 @@ def get_historico_versao(versoes,eventos,filter_column,campos_bloqueados,model_a
                                 campos_bloqueados = campos_bloqueados,
                                 mudancas = mudancas,
                                 event = event,
-                                log=log
                             )
                         else:
                             user = revision.user if revision.user_id else None
