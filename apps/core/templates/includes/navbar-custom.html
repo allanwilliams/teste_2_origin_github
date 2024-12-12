@@ -1,7 +1,7 @@
 {% load i18n static core_fieldset core_options %}
 {% get_use_fusionauth as use_fusionauth %}
 <input type="hidden" id="input-navbar-user-id" value="{{request.user.id}}">
-<link rel="stylesheet" href="{% static 'admin/css/custom-navbar.css' %}?v=1.1">
+<link rel="stylesheet" href="{% static 'admin/css/custom-navbar.css' %}?v=1.2">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" />
 <li class="dropdown notifications-menu menu-lembretes nav-item">
     <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false">
@@ -68,7 +68,7 @@
     </ul>
 </li>
 <li class="dropdown user user-menu nav-item">
-    <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
+    <a href="#" style="height: 50px" class="dropdown-toggle nav-link" data-toggle="dropdown">
      
         {% if request.user and request.user.foto %}
         <img alt='' src="{{ request.user.foto.url|encfile }}" class="user-image" style="width: 30px; height:30px; background-color: #fff;">
@@ -126,7 +126,7 @@
             <hr>
             <div class="row">
                 <div class="col-md-6 col-xs-6" style="text-align: center;">                    
-                    <a  href="{% if use_fusionauth %}/django_sso_app/sso-change-password{% else %}/admin/password_change/"{% endif %} class="item-footer">
+                    <a  href={% if use_fusionauth %}"/django_sso_app/sso-change-password"{% else %}"/admin/password_change/"{% endif %} class="item-footer">
                         <i class="fa-solid fa-lock"></i> {% trans 'Change password' %}
                     </a>
                 </div>
@@ -140,5 +140,5 @@
 
 {% block extrahead %}
 <script src={% static "admin/plugins/jQuery/jquery-2.2.3.min.js" %}></script>
-<script src="{% static 'admin/js/custom-navbar.js' %}?v=1.0"></script>
+<script src="{% static 'admin/js/custom-navbar.js' %}?v=1.2"></script>
 {% endblock %}

@@ -1,0 +1,276 @@
+{% extends 'generic_crud/generic_crud_base.html' %}
+{% load static core_fieldset %}
+{% block titulo %}{{crud.label}}{% endblock %}
+
+{% block conteudo %}
+<section class="content" id="generic-crud-resumo">
+    <input type="hidden" id="parent_id" value="{{parent_id}}">
+    <input type="hidden" id="instance-object-id" value="{{object_id}}">
+    <input type="hidden" id="processo_user_id" value="{{request.user.id}}">
+    {% include 'generic_crud/parciais/generic_django_messages.html' %}
+    {% include 'generic_crud/parciais/generic_form_errors.html' %}
+    <div class="box">
+        <div class="box-header with-border">
+            <h4 class="box-title">{% if instance_object %}{{instance_object}}{% endif %}</h4>
+            {% for action in crud.actions_top_bar %}
+                {% include action %}
+            {% endfor %}
+        </div>
+        <div class="box-body">
+            <div id="header-processo">
+                {% for resumo_col in crud.resumo%}
+                
+                <div id="header-processo-processo">
+                    <div class="card-perfil-dados">
+                        <div class="bloco-dados">
+                        {% for col in resumo_col%}
+                        {% with col_value=instance_object|get_field_from_instance:col %}
+                        <div>
+                            <p>
+                                <b>{{crud.model|get_field_label_from_classe:col|title}}:</b>
+                                {{ col_value|safe|default:'-' }}
+                            </p>
+                        </div>
+                        {% endwith %}
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div style="padding-left: 10px;">
+                {% with meta=crud.model|get_meta_from_classe %}
+                {% if not crud.disable_actions %}
+                <a class="btn btn-sm bg-gray" data-toggle="tooltip" data-placement="top" title="Editar {{crud.label}}" href="/{{meta.app_label}}/{{meta.model_name}}-editar/{{object_id}}/{{object_id}}"> 
+                    <i class="fa fa-pencil" ></i>
+                </a>
+                {% endif %}
+                {% endwith %}
+                {% for modal in crud.modais_visualizar %}
+                    {% include modal %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="box">
+        <div class="box-body">
+            <div class="nav-tabs-custom form-nav-tabs">
+                <ul class="nav nav-tabs" id="links-tabs">
+                    <li class="active"><a href="#tab-timeline" data-toggle="tab" aria-expanded="true" onclick="changeUrlHash('tab-timeline')">Histórico</a></li>
+                    {% for tab in tabs %}
+                        <li><a href="#{{tab.0.self_tab.model_name}}" data-toggle="tab" aria-expanded="true" onclick="changeUrlHash('{{tab.0.self_tab.model_name}}')">{{tab.0.self_tab.tab_name}}</a></li>
+                    {% endfor %}    
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-timeline">
+                        <div class="row">
+                            {% include "historico_padrao/historico_padrao_box_collapse.html" %}
+                        </div>
+                    </div> 
+                    {% for tab in tabs %}
+                        <div class="tab-pane" id="{{tab.0.self_tab.model_name}}">
+                            <div class="row">
+                                {% include 'generic_crud/generic_listar.html' %}
+                            </div>
+                        </div> 
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extrajs %}
+{{block.super}}
+<script>
+    const tabsNames = [
+        {% for tab in tabs %}
+        '#{{tab.0.self_tab.model_name}}',
+        {% endfor %}
+    ]
+
+    function actionaTabAtiva() {
+        const hashTab = window.location.hash
+        console.log(hashTab,tabsNames)
+        if(hashTab && tabsNames.includes(hashTab)) {
+            console.log(hashTab)
+            $(".nav li a").parent().removeClass("active");
+            $('.nav li a[href="' + hashTab + '"]').parent().addClass('active'); 
+            $(".tab-content .tab-pane").removeClass("active");
+            $(`.tab-content ${hashTab}`).addClass('active')
+        }
+    }
+
+    function deleteListener() {
+        $(".delete-link").click((event) => {
+            Swal.fire({
+                title: 'Tem certeza que deseja excluir esse item?',
+                icon: 'warning',
+                showDenyButton: true,
+                confirmButtonText: 'Sim',
+                denyButtonText: 'Não',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#preloader').fadeIn('slow')
+                    window.location.href = event.delegateTarget.href
+                }
+            })
+            return false
+        })
+    }
+
+    function hashChangeListener() {
+        window.addEventListener('hashchange', actionaTabAtiva, false);
+    }
+
+    function changeUrlHash(hash) {
+        window.location.hash = hash
+    }
+
+    $(document).ready(() => {
+        actionaTabAtiva()
+        deleteListener()
+        hashChangeListener()
+    })
+</script>
+
+
+<script>
+    document.querySelectorAll('#btnBaixarSelecionados')
+    .forEach(e=>{
+        e.addEventListener("click",() => {
+        baixarSelecionados();
+        
+        });
+    })
+
+    $('.selectAll').on('change',function(){
+        $('.select-id').prop('checked', this.checked)
+    })
+
+    function baixarSelecionados(){
+        var arquivos_selecionados = [];
+        $.each($('.select-id:checked'),function(k,v){
+            const link = $(v).parent().parent().children('.td-link-documento').children('a').attr('href')
+            arquivos_selecionados.push(decodeURI(link))
+        })
+        
+        if(arquivos_selecionados.length == 0){
+            alert('Pelo menos 1 arquivo precisa ser selecionado');
+            return false;
+        }
+        
+
+        $.ajax({
+            url: '/core/downloadFiles/',
+            method: "post",
+            data:{
+                filenames: arquivos_selecionados
+            },success: function(data){
+                saida = '<div> Os arquivo(s) abaixo não foram localizados e não puderam ser baixados.</div>';
+                $.each(data.arquivos_nao_localizados,function(k,v){
+                    saida += `<span> ${decodeURI(v)} </span>`
+                })
+                if(data.error){
+                    Swal.fire({
+                        title: "Erro",
+                        html: saida,
+                        icon: 'error',
+                        confirmButtonText: "OK"
+                    })
+                }
+                window.location = data.arquivo_zip;
+            }
+        })
+    }
+</script>
+<script>
+
+tinymce.init({
+    content_style: "body { font-family: 'Times New Roman'; } ",
+    font_formats: "Times New Roman; Arial=arial,helvetica,sans-serif; Arial Black=arial black,avant garde;Helvética",
+    selector: ".nossa-textarea-nova",
+    entity_encoding : "raw",
+    height: 500,
+    plugins: ["nonbreaking advlist autolink link image lists charmap print preview hr anchor",
+    "searchreplace wordcount visualchars code fullscreen insertdatetime media nonbreaking",
+    "table contextmenu directionality emoticons textcolor paste fullpage textcolor colorpicker textpattern"],
+    toolbar1: "bold italic underline strikethrough | alignleft aligncenter alignright alignjustify  lineheight | styleselect fontselect fontsizeselect ",
+    toolbar2: "cut copy paste | searchreplace | bullist numlist | outdent indent blockquote | undo redo | removeformat | insertdatetime preview | forecolor backcolor | table restoredraft | image | customInsertButton",
+    menubar: false,
+    language: 'pt_BR',
+    toolbar_items_size: 'small',
+    automatic_uploads: true,
+    file_picker_types: 'image',
+    nonbreaking_force_tab: true,
+    file_picker_callback: function (cb, value, meta) {
+        var input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+
+        input.onchange = function () {
+            var file = this.files[0];
+
+            var reader = new FileReader();
+            reader.onload = function () {
+
+                var id = 'blobid' + (new Date()).getTime();
+                var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
+                var base64 = reader.result.split(',')[1];
+                var blobInfo = blobCache.create(id, file, base64);
+                blobCache.add(blobInfo);
+
+                cb(blobInfo.blobUri(), { title: file.name });
+            };
+            reader.readAsDataURL(file);
+        };
+
+        input.click();
+    },
+    setup: function (editor) {
+
+        editor.ui.registry.addButton('customInsertButton', {
+        text: 'Linha',
+        onAction: function (_) {
+            editor.insertContent('<span>____________________________________________________________________________________________________</span>&nbsp;');
+        }
+        });
+
+        var toTimeHtml = function (date) {
+        return '<time datetime="' + date.toString() + '">' + date.toDateString() + '</time>';
+        };
+
+        editor.ui.registry.addButton('customDateButton', {
+        icon: 'insert-time',
+        tooltip: 'Insert Current Date',
+        disabled: true,
+        onAction: function (_) {
+            editor.insertContent(toTimeHtml(new Date()));
+        },
+        onSetup: function (buttonApi) {
+            var editorEventCallback = function (eventApi) {
+            buttonApi.setDisabled(eventApi.element.nodeName.toLowerCase() === 'time');
+            };
+            editor.on('NodeChange', editorEventCallback);
+
+            /* onSetup should always return the unbind handlers */
+            return function (buttonApi) {
+            editor.off('NodeChange', editorEventCallback);
+            };
+        }
+        });
+    },
+});
+</script>
+<script>
+    const abrirItem = (e) => {
+        const id = $(e).attr("data-id")
+        console.log(id)
+        const tr = $(`#collapse-${id}`)
+        tr.toggle(500, "linear")
+        const icone = document.querySelector(`i[data-id='${id}']`)
+        icone.classList.toggle('fa-rotate-180')
+    }
+</script>
+{% endblock %}

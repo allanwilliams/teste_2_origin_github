@@ -24,10 +24,7 @@ def importar_usuarios(request):
     return render(request, template, context)
 
 def return_context(request):
-    from apps.users.helpers import processar_linha_csv
     mensagem = ''
-    data = []
-    fusionauth_users = []
     if request.method == "POST":
         form = ImportarUsuariosForm(request.POST, request.FILES)
         if form.is_valid():
@@ -37,24 +34,17 @@ def return_context(request):
             uploaded_file_url = fs.url(filename)
             diretorio = os.path.dirname(os.path.dirname(filename))
             diretorio_arquivo = '{}{}{}'.format(settings.BASE_DIR,diretorio,uploaded_file_url)
-            with open(diretorio_arquivo, encoding='utf-8') as f:
-                csv_reader = csv.reader(f, delimiter=';')
-                csv_reader.__next__()
-                for row in csv_reader:
-                    result = processar_linha_csv(row)
-                    if result:
-                        if settings.USE_FUSIONAUTH: # pragma: no cover
-                            if result['user_data']:
-                                fusionauth_users.append(result['user_data'])
 
-                        result_data = result['result_data']
-                        data.append(result_data)
-            
+            csv_data = processar_csv(diretorio_arquivo)
+            data = csv_data['data']
+            fusionauth_users = csv_data['fusionauth_users']
+
             if len(fusionauth_users) > 0: # pragma: no cover
                 data = processar_usuarios_fusionauth(fusionauth_users,data)
 
             fs.delete(arquivo.name)
             mensagem = 'Upload realizado com sucesso!'
+            
     papeis = Papeis.objects.all()
     grupos = Group.objects.all()
 
@@ -69,6 +59,28 @@ def return_context(request):
         'context': context,
         'template': 'importar_usuarios.html'
     }
+
+def processar_csv(diretorio_arquivo):
+    from apps.users.helpers import processar_linha_csv
+    data = []
+    fusionauth_users = []
+    with open(diretorio_arquivo, encoding='utf-8') as f:
+        csv_reader = csv.reader(f, delimiter=';')
+        csv_reader.__next__()
+        for row in csv_reader:
+            result = processar_linha_csv(row)
+            if result:
+                if settings.USE_FUSIONAUTH: # pragma: no cover
+                    if result['user_data']:
+                        fusionauth_users.append(result['user_data'])
+
+                result_data = result['result_data']
+                data.append(result_data)
+    return {
+        'data':data,
+        'fusionauth_users': fusionauth_users
+    }
+
 @login_required
 def user_perfil(request, id):
     user =  User.objects.filter(pk=request.user.id).first()

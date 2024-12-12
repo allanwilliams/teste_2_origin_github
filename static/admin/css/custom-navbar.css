@@ -270,7 +270,7 @@ li.user-header>p {
 }
 
 .navbar > ul > li.nav-item {
-    height: 55px;
+    height: 50px;
     justify-content: center;
     align-items: center;
     display: flex;
@@ -285,13 +285,13 @@ li.user-header>p {
 }
 
 .main-header {
-    height: 60px;
+    height: 50px;
 }
 
-.navbar {
+/* .navbar {
     padding: 0.5em 0;
-    /* height: 55px; */
-}
+    height: 55px;
+} */
 
 .box {
     background-color: #fff;
