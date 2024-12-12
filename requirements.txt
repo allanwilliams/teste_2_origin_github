@@ -61,7 +61,7 @@ tomli==2.0.1
 tomlkit==0.11.4
 typed-ast==1.5.4
 typing-extensions==3.10.0.2
-urllib3==2.0.5
+urllib3<2
 waitress==2.1.2
 WebOb==1.8.7
 webservices==0.7
